@@ -73,7 +73,19 @@ const CATCOLOR = {
   buinho:'#2364ff', grocery:'#17a06b', bakery:'#d98a15', pharmacy:'#ff5050',
   food:'#8b5cf6', health:'#e11d48', money:'#0ea5e9', transport:'#6366f1', nature:'#0ea371'
 };
-function dirUrl(p){ return `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`; }
+// "Directions" hands off to the phone's OWN maps app (no Google lock-in):
+//  · iOS  -> Apple Maps (the iPhone default)
+//  · Android -> geo: link opens the default maps app / chooser
+//  · desktop/other -> OpenStreetMap directions (open-source, coherent with the map)
+function dirUrl(p){
+  const ua = navigator.userAgent || '';
+  const ios = /iP(hone|ad|od)/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const android = /Android/.test(ua);
+  const label = encodeURIComponent(t(p.name));
+  if(ios)     return `https://maps.apple.com/?daddr=${p.lat},${p.lng}&q=${label}`;
+  if(android) return `geo:${p.lat},${p.lng}?q=${p.lat},${p.lng}(${label})`;
+  return `https://www.openstreetmap.org/directions?to=${p.lat}%2C${p.lng}`;
+}
 function catMeta(cat){ return (CONTENT.map.categories[cat]) || { en:cat, pt:cat, icon:'📍' }; }
 
 function viewMap(){
