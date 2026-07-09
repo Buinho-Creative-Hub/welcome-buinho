@@ -1,6 +1,6 @@
 /* Minimal offline cache for the Buinho welcome PWA.
    Bump CACHE when you change assets so clients refresh. */
-const CACHE = 'buinho-welcome-v1';
+const CACHE = 'buinho-welcome-v2';
 const ASSETS = [
   './', './index.html', './css/styles.css',
   './js/content.js', './js/app.js', './manifest.webmanifest',

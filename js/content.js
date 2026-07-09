@@ -20,6 +20,7 @@ const CONTENT = {
   // ---- Home section cards (order = display order) ------------------------
   sections: [
     { id: "arrival",   icon: "🧭", title: { en: "Getting here",      pt: "Como chegar" } },
+    { id: "map",       icon: "🗺️", title: { en: "Map & services",    pt: "Mapa e serviços" } },
     { id: "house",     icon: "🏠", title: { en: "The house & rules", pt: "A casa e regras" } },
     { id: "fablab",    icon: "🛠️", title: { en: "The FabLab",        pt: "O FabLab" } },
     { id: "schedule",  icon: "🗓️", title: { en: "Your week",         pt: "A tua semana" } },
@@ -67,6 +68,150 @@ const CONTENT = {
     ],
     mapLabel: { en: "Open in Maps", pt: "Abrir no Maps" },
     mapUrl: "https://maps.google.com/?q=Messejana,+Aljustrel,+Portugal"
+  },
+
+  // ---- MAP & SERVICES ----------------------------------------------------
+  //  Interactive map of Messejana & around, powered by OpenStreetMap (no API
+  //  key, free, open-source). Every pin below is EDITABLE by the team — no
+  //  code needed. Change the text between quotes; keep commas and brackets.
+  //
+  //  ▸ HOW TO FIX A PIN'S POSITION (5 seconds):
+  //    1. Open Google Maps or https://www.openstreetmap.org in a browser.
+  //    2. Right-click the exact spot → "What's here?" (or copy coordinates).
+  //    3. It shows two numbers, e.g.  37.7855, -8.2450
+  //    4. Paste the FIRST into  lat:  and the SECOND into  lng:  below.
+  //
+  //  ▸ Opening hours: replace the [•••] with real hours, e.g. "9:00–13:00, 15:00–19:00".
+  //  ▸ Categories (pick one per place): grocery, bakery, pharmacy, food,
+  //    health, money, transport, nature, buinho.  (Controls the pin colour/icon.)
+  //  ▸ The coordinates below are APPROXIMATE starting points — please verify
+  //    each pin once with the steps above.
+  map: {
+    intro: {
+      en: "Everyday spots around Messejana. Tap a pin or a card for hours and directions.",
+      pt: "Sítios do dia-a-dia em Messejana. Toca num pin ou cartão para horários e como ir."
+    },
+    // Map starting view (centre + zoom). Messejana village centre.
+    center: { lat: 37.7855, lng: -8.2450 },
+    zoom: 15,
+    // Labels for the category filter chips (bilingual).
+    categories: {
+      buinho:    { en: "Buinho",       pt: "Buinho",       icon: "🛠️" },
+      grocery:   { en: "Groceries",    pt: "Mercearia",    icon: "🛒" },
+      bakery:    { en: "Bakery",       pt: "Padaria",      icon: "🥖" },
+      pharmacy:  { en: "Pharmacy",     pt: "Farmácia",     icon: "💊" },
+      food:      { en: "Café & food",  pt: "Café e comida",icon: "☕" },
+      health:    { en: "Health",       pt: "Saúde",        icon: "🏥" },
+      money:     { en: "ATM / bank",   pt: "Multibanco",   icon: "🏧" },
+      transport: { en: "Transport",    pt: "Transportes",  icon: "🚌" },
+      nature:    { en: "Nature",       pt: "Natureza",     icon: "🏞️" }
+    },
+    places: [
+      {
+        cat: "buinho",
+        name: { en: "Buinho FabLab", pt: "Buinho FabLab" },
+        note: { en: "The FabLab & residency base. Start here.", pt: "O FabLab e base da residência. Começa aqui." },
+        address: "Messejana, Aljustrel",
+        hours: { en: "Working hours (ask your host)", pt: "Horário de trabalho (pergunta ao anfitrião)" },
+        lat: 37.7855, lng: -8.2450
+      },
+      {
+        cat: "buinho",
+        name: { en: "Residency house", pt: "Casa de residência" },
+        note: { en: "Where you sleep. Your host gives the exact door.", pt: "Onde dormes. O anfitrião indica a porta exata." },
+        address: "[•••] Messejana",
+        hours: { en: "—", pt: "—" },
+        lat: 37.7860, lng: -8.2445
+      },
+      {
+        cat: "grocery",
+        name: { en: "Village grocery / mini-market", pt: "Mercearia da aldeia" },
+        note: { en: "Basics: bread, milk, fruit, tinned goods.", pt: "Básicos: pão, leite, fruta, conservas." },
+        address: "[•••] Messejana",
+        hours: { en: "[•••]", pt: "[•••]" },
+        lat: 37.7851, lng: -8.2458
+      },
+      {
+        cat: "bakery",
+        name: { en: "Bakery", pt: "Padaria" },
+        note: { en: "Fresh bread in the morning. Try the local loaf.", pt: "Pão fresco de manhã. Prova o pão da terra." },
+        address: "[•••] Messejana",
+        hours: { en: "[•••]", pt: "[•••]" },
+        lat: 37.7858, lng: -8.2461
+      },
+      {
+        cat: "pharmacy",
+        name: { en: "Pharmacy (Messejana)", pt: "Farmácia (Messejana)" },
+        note: { en: "Medicines & basic health advice.", pt: "Medicamentos e conselho de saúde básico." },
+        address: "[•••] Messejana",
+        hours: { en: "[•••]", pt: "[•••]" },
+        lat: 37.7849, lng: -8.2452
+      },
+      {
+        cat: "food",
+        name: { en: "Café on the square", pt: "Café da praça" },
+        note: { en: "Coffee, snacks and a place to sit. Praça 1º de Julho.", pt: "Café, petiscos e sítio para estar. Praça 1º de Julho." },
+        address: "Praça 1º de Julho, Messejana",
+        hours: { en: "[•••]", pt: "[•••]" },
+        lat: 37.7853, lng: -8.2447
+      },
+      {
+        cat: "food",
+        name: { en: "Restaurant / tasca", pt: "Restaurante / tasca" },
+        note: { en: "Local Alentejo dishes. Ask about the daily special.", pt: "Pratos alentejanos. Pergunta pelo prato do dia." },
+        address: "[•••] Messejana",
+        hours: { en: "[•••]", pt: "[•••]" },
+        lat: 37.7856, lng: -8.2440
+      },
+      {
+        cat: "health",
+        name: { en: "Health post (Messejana)", pt: "Extensão de Saúde (Messejana)" },
+        note: { en: "Local health extension. For emergencies call 112.", pt: "Extensão de saúde local. Em emergência liga 112." },
+        address: "Rua da Bicada 11, 7600-320 Messejana",
+        hours: { en: "[•••]", pt: "[•••]" },
+        lat: 37.7847, lng: -8.2463
+      },
+      {
+        cat: "health",
+        name: { en: "Aljustrel Health Centre", pt: "Centro de Saúde de Aljustrel" },
+        note: { en: "Main health centre, ~15 km. For non-urgent care.", pt: "Centro de saúde principal, ~15 km. Cuidados não urgentes." },
+        address: "Rua de Beja, 7600-073 Aljustrel",
+        hours: { en: "[•••]", pt: "[•••]" },
+        lat: 37.8710, lng: -8.1660
+      },
+      {
+        cat: "money",
+        name: { en: "ATM (Multibanco)", pt: "Multibanco (ATM)" },
+        note: { en: "Cash. Some village shops are cash-only.", pt: "Dinheiro. Algumas lojas da aldeia são só a dinheiro." },
+        address: "[•••] Messejana",
+        hours: { en: "24h", pt: "24h" },
+        lat: 37.7852, lng: -8.2451
+      },
+      {
+        cat: "transport",
+        name: { en: "Bus stop", pt: "Paragem de autocarro" },
+        note: { en: "Coaches to Aljustrel / Ferreira / Lisbon. Check times ahead.", pt: "Camionetas para Aljustrel / Ferreira / Lisboa. Confirma horários antes." },
+        address: "[•••] Messejana",
+        hours: { en: "See timetable", pt: "Ver horário" },
+        lat: 37.7862, lng: -8.2455
+      },
+      {
+        cat: "grocery",
+        name: { en: "Supermarket (Aljustrel)", pt: "Supermercado (Aljustrel)" },
+        note: { en: "Bigger shop for a full week's groceries, ~15 km.", pt: "Loja maior para compras da semana, ~15 km." },
+        address: "Aljustrel",
+        hours: { en: "[•••]", pt: "[•••]" },
+        lat: 37.8720, lng: -8.1685
+      },
+      {
+        cat: "nature",
+        name: { en: "Barragem do Roxo", pt: "Barragem do Roxo" },
+        note: { en: "Reservoir nearby — walking and a summer swim.", pt: "Barragem perto — passeio e banho no verão." },
+        address: "Barragem do Roxo",
+        hours: { en: "Daylight", pt: "Durante o dia" },
+        lat: 37.8300, lng: -8.1600
+      }
+    ]
   },
 
   // ---- HOUSE -------------------------------------------------------------

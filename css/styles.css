@@ -113,3 +113,55 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--blue);border-col
 .bottombar button.on{color:var(--blue)}
 
 .foot{text-align:center;color:var(--muted);font-size:12px;padding:22px 0 8px}
+
+/* =======================================================================
+   MAP & SERVICES  (Leaflet + OpenStreetMap)
+   ======================================================================= */
+
+/* category filter chips — horizontal scroll row */
+.mapchips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none}
+.mapchips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;background:#fff;
+  border:1px solid var(--line);border-radius:999px;padding:8px 13px;font:inherit;font-weight:700;
+  font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .12s ease}
+.chip .cd{width:11px;height:11px;border-radius:50%;background:var(--pc,var(--blue));flex:0 0 auto}
+.chip.on{color:var(--ink);border-color:var(--pc,var(--blue));background:#fff;
+  box-shadow:0 0 0 1.5px var(--pc,var(--blue)) inset}
+.chip:not(.on){opacity:.55}
+.chip:not(.on) .cd{background:var(--muted)}
+
+/* the map itself — stays below the sticky top bar (z-20) */
+#map{height:58vh;min-height:320px;border-radius:var(--radius);border:1px solid var(--line);
+  overflow:hidden;box-shadow:var(--shadow);position:relative;z-index:1;background:var(--wall-2)}
+.leaflet-container{font-family:inherit}
+
+/* custom pin marker (Leaflet divIcon) */
+.pin{width:32px;height:32px;border-radius:50% 50% 50% 50%;background:#fff;
+  border:3px solid var(--pc,var(--blue));display:flex;align-items:center;justify-content:center;
+  font-size:16px;line-height:1;box-shadow:0 3px 8px rgba(26,26,26,.28);position:relative}
+.pin::after{content:"";position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);
+  width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;
+  border-top:9px solid var(--pc,var(--blue))}
+
+/* popup content */
+.leaflet-popup-content{margin:12px 14px;line-height:1.4}
+.pop-t{font-weight:800;font-size:15px;margin-bottom:2px}
+.pop-c{font-weight:700;font-size:12px;margin-bottom:6px}
+.pop-h,.pop-a{font-size:13px;color:#333;margin:2px 0}
+.pop-d{display:inline-block;margin-top:8px;background:var(--blue);color:#fff !important;
+  font-weight:700;font-size:13px;padding:8px 12px;border-radius:10px}
+
+/* synced list of places */
+.placelist{margin-top:14px;display:flex;flex-direction:column;gap:10px}
+.placecard{display:flex;gap:12px;background:#fff;border:1px solid var(--line);
+  border-left:5px solid var(--pc,var(--blue));border-radius:14px;padding:12px 14px;
+  box-shadow:var(--shadow);cursor:pointer;transition:transform .12s ease,background .3s ease}
+.placecard:active{transform:scale(.99)}
+.placecard.flash{background:#fff7e6}
+.pc-ic{font-size:22px;flex:0 0 auto;line-height:1.3}
+.pc-body{flex:1;min-width:0}
+.pc-name{font-weight:700;font-size:15px}
+.pc-note{color:#333;font-size:13.5px;margin:2px 0}
+.pc-meta{color:var(--muted);font-size:12.5px;margin-top:3px}
+.pc-dir{display:inline-block;margin-top:8px;font-weight:700;font-size:13px;color:var(--blue)}

@@ -66,6 +66,135 @@ function viewArrival(){
   return v;
 }
 
+/* ---------- MAP & SERVICES (Leaflet + OpenStreetMap, no API key) ---------- */
+let _map = null;            // Leaflet map instance (rebuilt each time the view opens)
+let _markers = {};         // cat -> [marker,...]  for filtering
+const CATCOLOR = {
+  buinho:'#2364ff', grocery:'#17a06b', bakery:'#d98a15', pharmacy:'#ff5050',
+  food:'#8b5cf6', health:'#e11d48', money:'#0ea5e9', transport:'#6366f1', nature:'#0ea371'
+};
+function dirUrl(p){ return `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`; }
+function catMeta(cat){ return (CONTENT.map.categories[cat]) || { en:cat, pt:cat, icon:'📍' }; }
+
+function viewMap(){
+  const d = CONTENT.map, v = el('div');
+  v.appendChild(viewHead(CONTENT.sections.find(s=>s.id==='map').title, d.intro));
+
+  // If Leaflet failed to load (e.g. offline first run), degrade gracefully.
+  if(typeof window.L === 'undefined'){
+    v.appendChild(block(null,
+      `<p>${L()==='pt'
+        ? 'O mapa precisa de internet na primeira abertura. Sem ligação agora — mas tens a lista de sítios abaixo.'
+        : 'The map needs internet on first open. You seem offline — the list of places is below.'}</p>`));
+  }
+
+  // ----- category filter chips -----
+  const cats = Object.keys(d.categories);
+  const active = new Set(cats);              // all on by default
+  const chips = el('div','mapchips');
+  cats.forEach(cat=>{
+    const m = catMeta(cat);
+    const chip = el('button','chip on');
+    chip.style.setProperty('--pc', CATCOLOR[cat]||'#2364ff');
+    chip.innerHTML = `<span class="cd"></span>${m.icon} ${esc(t(m))}`;
+    chip.onclick = ()=>{
+      const on = chip.classList.toggle('on');
+      if(on) active.add(cat); else active.delete(cat);
+      applyFilter();
+    };
+    chips.appendChild(chip);
+  });
+  v.appendChild(chips);
+
+  // ----- map container -----
+  const mapBox = el('div'); mapBox.id = 'map';
+  v.appendChild(mapBox);
+
+  // ----- synced list of places -----
+  const list = el('div','placelist');
+  d.places.forEach((p, i)=>{
+    const m = catMeta(p.cat);
+    const card = el('div','placecard');
+    card.dataset.cat = p.cat;
+    card.style.setProperty('--pc', CATCOLOR[p.cat]||'#2364ff');
+    card.innerHTML =
+      `<div class="pc-ic">${m.icon}</div>
+       <div class="pc-body">
+         <div class="pc-name">${esc(t(p.name))}</div>
+         <div class="pc-note">${esc(t(p.note))}</div>
+         <div class="pc-meta">🕐 ${esc(t(p.hours))}${p.address?` · ${esc(p.address)}`:''}</div>
+         <a class="pc-dir" href="${dirUrl(p)}" target="_blank" rel="noopener">🧭 ${L()==='pt'?'Como ir':'Directions'}</a>
+       </div>`;
+    card.querySelector('.pc-dir').onclick = (e)=> e.stopPropagation();
+    card.onclick = ()=>{ if(_map){ _map.setView([p.lat,p.lng], 17); const mk=(_markers[p.cat]||[])[0]; }
+      openMarker(i); window.scrollTo({top:0,behavior:'smooth'}); };
+    card.dataset.idx = i;
+    list.appendChild(card);
+  });
+  v.appendChild(list);
+
+  // keep a reference so openMarker/applyFilter can reach the DOM cards
+  v._list = list;
+
+  // ----- build the Leaflet map AFTER the view is in the DOM -----
+  const flatMarkers = [];
+  function buildMap(){
+    if(typeof window.L === 'undefined') return;      // no Leaflet, list-only mode
+    if(_map){ try{ _map.remove(); }catch{} _map=null; }
+    _markers = {};
+    _map = L.map('map', { scrollWheelZoom:false }).setView([d.center.lat, d.center.lng], d.zoom);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap'
+    }).addTo(_map);
+
+    d.places.forEach((p, i)=>{
+      const color = CATCOLOR[p.cat]||'#2364ff';
+      const m = catMeta(p.cat);
+      const icon = L.divIcon({
+        className:'', iconSize:[34,34], iconAnchor:[17,34], popupAnchor:[0,-30],
+        html:`<div class="pin" style="--pc:${color}">${m.icon}</div>`
+      });
+      const marker = L.marker([p.lat, p.lng], { icon }).addTo(_map);
+      marker.bindPopup(
+        `<div class="pop">
+           <div class="pop-t">${esc(t(p.name))}</div>
+           <div class="pop-c" style="color:${color}">${m.icon} ${esc(t(m))}</div>
+           <div class="pop-h">🕐 ${esc(t(p.hours))}</div>
+           ${p.address?`<div class="pop-a">📍 ${esc(p.address)}</div>`:''}
+           <a class="pop-d" href="${dirUrl(p)}" target="_blank" rel="noopener">🧭 ${L()==='pt'?'Como ir':'Directions'}</a>
+         </div>`);
+      (_markers[p.cat] = _markers[p.cat]||[]).push(marker);
+      flatMarkers[i] = marker;
+      marker.on('click', ()=> {
+        const c = list.querySelector(`.placecard[data-idx="${i}"]`);
+        if(c){ c.classList.add('flash'); setTimeout(()=>c.classList.remove('flash'),1200); }
+      });
+    });
+    // Leaflet needs a size recalculation when its container was just inserted.
+    setTimeout(()=>{ try{ _map.invalidateSize(); }catch{} }, 120);
+  }
+  window._openMarkerImpl = (i)=>{ if(flatMarkers[i]) flatMarkers[i].openPopup(); };
+
+  function applyFilter(){
+    // markers
+    Object.keys(_markers).forEach(cat=>{
+      _markers[cat].forEach(mk=>{
+        if(active.has(cat)){ if(!_map.hasLayer(mk)) mk.addTo(_map); }
+        else { if(_map.hasLayer(mk)) _map.removeLayer(mk); }
+      });
+    });
+    // list cards
+    list.querySelectorAll('.placecard').forEach(c=>{
+      c.style.display = active.has(c.dataset.cat) ? '' : 'none';
+    });
+  }
+  v._buildMap = buildMap;
+  v._applyFilter = applyFilter;
+  return v;
+}
+function openMarker(i){ if(window._openMarkerImpl) window._openMarkerImpl(i); }
+
 /* ---------- HOUSE ---------- */
 function viewHouse(){
   const d = CONTENT.house, v = el('div');
@@ -225,7 +354,7 @@ const val = (id)=> (document.getElementById(id)?.value || '').trim();
 
 /* ---------- router ---------- */
 const VIEWS = {
-  arrival:viewArrival, house:viewHouse, fablab:viewFablab, schedule:viewSchedule,
+  arrival:viewArrival, map:viewMap, house:viewHouse, fablab:viewFablab, schedule:viewSchedule,
   contacts:viewContacts, local:viewLocal, checkin:viewCheckin, reserve:viewReserve
 };
 function go(id){ location.hash = id ? '#'+id : '#home'; }
@@ -239,10 +368,12 @@ function route(){
     back.style.visibility='hidden';
     window.scrollTo(0,0);
   } else {
-    detail.innerHTML=''; detail.appendChild(VIEWS[id]());
+    const node = VIEWS[id]();
+    detail.innerHTML=''; detail.appendChild(node);
     detail.classList.add('active'); home.classList.remove('active');
     back.style.visibility='visible';
     window.scrollTo(0,0);
+    if(typeof node._buildMap === 'function'){ node._buildMap(); }   // init Leaflet once in DOM
   }
   document.querySelectorAll('.bottombar button').forEach(b=>{
     b.classList.toggle('on', b.dataset.go===id || (id==='home'&&b.dataset.go==='home'));

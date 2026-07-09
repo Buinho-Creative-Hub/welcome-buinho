@@ -11,6 +11,10 @@ Android, e pode ser "instalada" no ecrã inicial.
 ### O que faz (v1)
 - **Hub de informação curada:** como chegar, a casa e regras, o FabLab e equipamento,
   a semana, contactos e segurança, Messejana e arredores.
+- **Mapa e serviços:** mapa interativo de Messejana com pins para mercearias, padaria,
+  farmácia, cafés, saúde, multibanco, transportes e barragem — com horários e botão
+  "como ir". Motor **OpenStreetMap via Leaflet** (open-source, **sem chave de API**,
+  sem conta de faturação). Filtro por categoria e lista sincronizada com o mapa.
 - **Camada interativa:** check-in à chegada, e pedido de reserva de máquina.
   *(v1 entrega um email pronto a enviar à equipa; ver "Backend" abaixo.)*
 - **Bilingue EN/PT** com botão de troca no topo.
@@ -23,6 +27,13 @@ de editar, faz commit / upload — o service worker serve a versão nova (subir 
 em `CACHE` no `service-worker.js` força refresh em todos os telemóveis).
 
 Preenche os campos marcados com `[•••]` (morada, passwords Wi-Fi, telefones).
+
+**Mapa — corrigir a posição de um pin (5 segundos):** cada sítio está na lista
+`map.places` do `js/content.js`. Abre o Google Maps ou o openstreetmap.org, clica com
+o botão direito no local exato → "O que está aqui?", copia os dois números (ex.:
+`37.7855, -8.2450`) e cola o primeiro em `lat:` e o segundo em `lng:`. Os horários
+mudam-se no campo `hours` (substituir os `[•••]`). As coordenadas atuais são pontos
+de partida aproximados — vale a pena a equipa validar cada pin uma vez.
 
 ### Backend (v1.1 — opcional)
 Check-in e reservas têm um **hook documentado** no `js/app.js` (procurar `BACKEND HOOK`).
