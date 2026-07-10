@@ -1,167 +1,150 @@
-/* WELCOME · BUINHO AIR — Buinho Main identity
-   Messejana Blue #2364ff · Creative Red #ff5050 · Alentejo Sun #ffc850
-   Manual Black #1a1a1a · White Wall #fafafa · type: ASAP
-   Gris rules: background never pure #fff, never black boxes. */
-
+/* ============================================================================
+   styles.css — welcome-buinho (Direcção B + azulejo, paleta Buinho Main)
+   Gris → Albano, 2026-07-10. Motivos de azulejo reconstruídos em SVG (no HTML).
+   Leaflet CSS é carregado do CDN (unpkg) no index.html — aqui só o app.
+   ============================================================================ */
 :root{
-  --blue:#2364ff; --red:#ff5050; --sun:#ffc850;
-  --ink:#1a1a1a; --wall:#fafafa; --wall-2:#f1f0ec;
-  --line:#e3e1da; --muted:#5a5a5a;
-  --radius:18px; --maxw:560px;
-  --shadow:0 6px 22px rgba(26,26,26,.08);
+  --blue:#2364ff;        /* Messejana Blue */
+  --blue-deep:#1b3fb0;   /* azulejo cobalto (sombra do azul) */
+  --red:#ff5050;         /* Creative Red */
+  --sun:#ffc850;         /* Alentejo Sun */
+  --ink:#1a1a1a;         /* Manual Black — só texto */
+  --wall:#fafafa;        /* White Wall — fundo */
+  --cream:#f4f0e8;       /* creme de azulejaria, superfícies quentes */
+  --wall-2:#f1f0ec;
+  --line:#e3e1da; --line-2:#e6e4dd;
+  --muted:#5a5a5a; --faint:#9a978f;
+  --radius:18px; --radius-s:12px; --maxw:560px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
 body{
   font-family:'Asap',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
   background:var(--wall); color:var(--ink);
-  font-size:16px; line-height:1.5;
-  padding-bottom:84px; /* room for bottom bar */
+  font-size:16px; line-height:1.5; padding-bottom:86px;
 }
 a{color:var(--blue);text-decoration:none}
-.app{max-width:var(--maxw);margin:0 auto;padding:0 18px}
+.app{max-width:var(--maxw);margin:0 auto;padding:0 20px}
 
-/* ---- top bar ---- */
-.topbar{
-  position:sticky;top:0;z-index:20;background:var(--wall);
-  border-bottom:1px solid var(--line);
-  display:flex;align-items:center;gap:12px;
-  padding:12px 18px; max-width:var(--maxw); margin:0 auto;
-}
-.topbar .brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:17px}
-.topbar .dot{width:22px;height:22px;border-radius:6px;background:var(--blue);display:inline-block;
-  transform:rotate(-4deg)}
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:0;z-index:30;background:var(--wall);
+  border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;
+  padding:12px 20px;max-width:var(--maxw);margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.2px}
+.brand .mk{width:24px;height:24px;display:block}
 .spacer{flex:1}
 .lang{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:#fff}
 .lang button{border:0;background:transparent;padding:6px 12px;font:inherit;font-weight:700;
   font-size:13px;color:var(--muted);cursor:pointer}
 .lang button.on{background:var(--ink);color:#fff}
 .back{border:0;background:transparent;font:inherit;font-weight:700;color:var(--blue);
-  cursor:pointer;padding:6px 4px;font-size:15px}
+  cursor:pointer;padding:6px 2px;font-size:15px;display:none}
 
-/* ---- hero (home) ---- */
-.hero{padding:22px 0 8px}
-.hero h1{font-size:34px;line-height:1.05;font-weight:800;margin:0 0 8px;letter-spacing:-.5px}
-.hero p{margin:0;color:var(--muted);font-size:16px}
-.hero .accent{color:var(--blue)}
-
-/* ---- section grid ---- */
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
-.card{
-  background:#fff;border:1px solid var(--line);border-radius:var(--radius);
-  padding:16px;cursor:pointer;display:flex;flex-direction:column;gap:8px;min-height:104px;
-  box-shadow:var(--shadow);transition:transform .12s ease}
-.card:active{transform:scale(.98)}
-.card .ic{font-size:26px}
-.card .t{font-weight:700;font-size:15px;line-height:1.2}
-.card.wide{grid-column:1 / -1;flex-direction:row;align-items:center;gap:14px;min-height:auto}
-.card.accent{background:var(--blue);border-color:var(--blue);color:#fff}
-.card.accent .t{color:#fff}
-.card.sun{background:var(--sun);border-color:var(--sun)}
-
-/* ---- detail view ---- */
-.view{padding:14px 0 30px;display:none}
+/* ---------- views ---------- */
+.view{display:none;padding:18px 0 30px}
 .view.active{display:block;animation:fade .18s ease}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.view h2{font-size:26px;font-weight:800;margin:6px 0 4px;letter-spacing:-.3px}
-.view .lead{color:var(--muted);margin:0 0 16px}
-.block{background:#fff;border:1px solid var(--line);border-radius:var(--radius);
-  padding:15px 16px;margin:0 0 12px;box-shadow:var(--shadow)}
-.block h3{margin:0 0 6px;font-size:16px;font-weight:700}
+
+/* ---------- hero (home) ---------- */
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--faint);margin:4px 0 8px}
+.h1{font-size:38px;line-height:1.02;font-weight:800;letter-spacing:-1px;margin:0 0 14px}
+.h1 .dot{color:var(--blue)}
+/* azulejo frieze band */
+.frieze{width:100%;height:34px;display:block;margin:2px 0 20px;overflow:hidden}
+
+/* ---------- essentials card (sun) ---------- */
+.ess{background:var(--sun);border-radius:var(--radius);padding:6px 18px 8px;margin:0 0 22px;
+  position:relative;overflow:hidden}
+.ess .lbl{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#7a5a00;padding:14px 0 4px}
+.ess .row{display:flex;justify-content:space-between;align-items:center;gap:14px;
+  padding:12px 0;border-top:1px solid rgba(26,26,26,.14)}
+.ess .row:first-of-type{border-top:0}
+.ess .k{font-size:15px;font-weight:600;color:#3a2c00}
+.ess .v{font-weight:800;text-align:right;color:var(--ink)}
+.ess .v a{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
+.ess .v.red{color:#c0392b}
+.ess-tile{position:absolute;right:-14px;top:-14px;width:78px;height:78px;opacity:.16}
+
+/* ---------- numbered index ---------- */
+.idx{list-style:none;margin:0;padding:0}
+.idx li{display:flex;align-items:center;gap:16px;padding:20px 2px;border-top:1px solid var(--line);cursor:pointer}
+.idx li:active{opacity:.6}
+.idx .n{font-size:13px;font-weight:700;color:var(--faint);width:20px;flex:0 0 auto}
+.idx .ti{font-size:20px;font-weight:800;letter-spacing:-.3px;flex:1}
+.idx .todo{font-size:11px;font-weight:800;color:var(--blue);border:1.5px solid var(--blue);
+  border-radius:999px;padding:3px 10px;letter-spacing:.4px;text-transform:uppercase}
+.idx .arr{color:var(--faint);font-size:18px}
+
+.foot{text-align:center;color:var(--faint);font-size:12px;padding:26px 0 6px}
+
+/* ---------- detail ---------- */
+.h2{font-size:28px;font-weight:800;letter-spacing:-.4px;margin:2px 0 4px}
+.lead{color:var(--muted);margin:0 0 18px}
+.block{padding:16px 0;border-top:1px solid var(--line)}
+.block:first-of-type{border-top:0}
+.block h3{margin:0 0 6px;font-size:17px;font-weight:800}
 .block p{margin:0;color:#333}
-.kv{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
 .kv:last-child{border-bottom:0}
 .kv .k{color:var(--muted);font-size:14px}
 .kv .v{font-weight:700;text-align:right}
-ul.rules{margin:0;padding-left:18px}
-ul.rules li{margin:7px 0}
-.pill{display:inline-block;font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;
-  background:var(--wall-2);color:var(--muted);margin-left:6px}
-.pill.book{background:#ffe9c9;color:#8a5a00}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  background:var(--blue);color:#fff;border:0;border-radius:12px;padding:13px 18px;
-  font:inherit;font-weight:700;font-size:15px;cursor:pointer;width:100%;margin-top:4px}
+.mtag{display:inline-block;font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px;
+  background:#fff2d2;color:#8a5a00;margin-left:8px;text-transform:uppercase;letter-spacing:.4px;vertical-align:middle}
+ul.rules{margin:6px 0 0;padding-left:0;list-style:none}
+ul.rules li{position:relative;padding:8px 0 8px 26px;border-bottom:1px solid var(--line)}
+ul.rules li:last-child{border-bottom:0}
+ul.rules li::before{content:"";position:absolute;left:0;top:14px;width:12px;height:12px;
+  background:var(--blue);border-radius:3px;transform:rotate(-6deg)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--blue);
+  color:#fff;border:0;border-radius:var(--radius-s);padding:14px 18px;font:inherit;font-weight:700;
+  font-size:15px;cursor:pointer;width:100%;margin-top:14px}
 .btn.ghost{background:#fff;color:var(--blue);border:1.5px solid var(--blue)}
 .btn.red{background:var(--red)}
 
-/* emergency strip */
-.sos{display:flex;align-items:center;gap:12px;background:#fff0f0;border:1px solid #ffd0d0;
-  border-radius:var(--radius);padding:14px 16px;margin:0 0 14px}
-.sos .n{font-size:24px;font-weight:800;color:var(--red)}
+/* sos */
+.sos{background:#fff2f2;border:1px solid #ffd0d0;border-radius:var(--radius);
+  padding:18px;margin:0 0 8px;display:flex;align-items:center;gap:16px}
+.sos .n{font-size:40px;font-weight:800;color:var(--red);line-height:1}
 
 /* forms */
-label.f{display:block;font-weight:700;font-size:14px;margin:12px 0 5px}
-input,select,textarea{width:100%;font:inherit;padding:12px 13px;border:1px solid var(--line);
-  border-radius:12px;background:#fff;color:var(--ink)}
+label.f{display:block;font-weight:700;font-size:14px;margin:14px 0 5px}
+input,select,textarea{width:100%;font:inherit;padding:13px;border:1px solid var(--line);
+  border-radius:var(--radius-s);background:#fff;color:var(--ink)}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--blue);border-color:var(--blue)}
-.check{display:flex;align-items:flex-start;gap:11px;background:#fff;border:1px solid var(--line);
-  border-radius:14px;padding:13px 14px;margin:8px 0;cursor:pointer}
-.check input{width:22px;height:22px;flex:0 0 auto;margin-top:1px}
-.check .cl{font-weight:600;font-size:15px}
-.note{font-size:13px;color:var(--muted);margin-top:3px}
-.done-stamp{background:#e9f7ec;border:1px solid #bfe6c8;color:#1f7a39;border-radius:12px;
-  padding:11px 14px;font-weight:700;margin-top:10px;display:none}
-.done-stamp.show{display:block}
+.done{background:#e9f7ec;border:1px solid #bfe6c8;color:#1f7a39;border-radius:var(--radius-s);
+  padding:12px 14px;font-weight:700;margin-top:12px;display:none}
+.done.show{display:block}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
-/* bottom bar */
-.bottombar{position:fixed;left:0;right:0;bottom:0;background:var(--wall);
-  border-top:1px solid var(--line);z-index:20}
-.bottombar .inner{max-width:var(--maxw);margin:0 auto;display:flex;justify-content:space-around;padding:8px 6px}
-.bottombar button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;
-  gap:2px;font:inherit;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;padding:4px 10px}
-.bottombar button .bi{font-size:20px}
+/* ---------- MAP screen ---------- */
+.mapwrap{position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line-2);
+  background:var(--cream);height:330px;margin:4px 0 14px}
+#leaflet{position:absolute;inset:0;width:100%;height:100%;background:var(--cream)}
+.leaflet-container{font-family:'Asap',sans-serif;background:#eef0ea}
+/* custom marker (rounded colour tile + meaningful white glyph) */
+.mk-tile{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 3px 8px rgba(26,26,26,.28);border:2px solid #fff}
+.mk-sel{outline:3px solid var(--ink);outline-offset:1px;border-radius:12px}
+.cats{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.cat{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:700;border:1px solid var(--line);
+  background:#fff;border-radius:999px;padding:6px 12px;cursor:pointer;color:var(--muted)}
+.cat .sw{width:14px;height:14px;border-radius:4px}
+.cat.on{border-color:var(--ink);color:var(--ink)}
+.spot{display:flex;align-items:flex-start;gap:13px;padding:14px 2px;border-top:1px solid var(--line);cursor:pointer}
+.spot:first-child{border-top:0}
+.spot .sq{width:26px;height:26px;border-radius:7px;flex:0 0 auto;margin-top:2px;display:flex;align-items:center;justify-content:center}
+.spot .nm{font-weight:800;font-size:16px}
+.spot .meta{color:var(--muted);font-size:13px;margin-top:2px}
+.spot .go{margin-left:auto;color:var(--blue);font-weight:700;font-size:13px;white-space:nowrap;align-self:center}
+.editnote{background:var(--cream);border:1px dashed #cbb78a;border-radius:var(--radius-s);
+  padding:12px 14px;font-size:13px;color:#6b5a2e;margin-top:16px}
+.editnote b{color:#4a3d13}
+
+/* ---------- bottom nav ---------- */
+.bottombar{position:fixed;left:0;right:0;bottom:0;background:var(--wall);border-top:1px solid var(--line);z-index:30}
+.bottombar .inner{max-width:var(--maxw);margin:0 auto;display:flex;justify-content:space-around;padding:9px 6px}
+.bottombar button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;
+  font:inherit;font-size:11px;font-weight:700;color:var(--faint);cursor:pointer;padding:2px 10px}
+.bottombar button svg{width:22px;height:22px;display:block}
 .bottombar button.on{color:var(--blue)}
-
-.foot{text-align:center;color:var(--muted);font-size:12px;padding:22px 0 8px}
-
-/* =======================================================================
-   MAP & SERVICES  (Leaflet + OpenStreetMap)
-   ======================================================================= */
-
-/* category filter chips — horizontal scroll row */
-.mapchips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;-webkit-overflow-scrolling:touch;
-  scrollbar-width:none}
-.mapchips::-webkit-scrollbar{display:none}
-.chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;background:#fff;
-  border:1px solid var(--line);border-radius:999px;padding:8px 13px;font:inherit;font-weight:700;
-  font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .12s ease}
-.chip .cd{width:11px;height:11px;border-radius:50%;background:var(--pc,var(--blue));flex:0 0 auto}
-.chip.on{color:var(--ink);border-color:var(--pc,var(--blue));background:#fff;
-  box-shadow:0 0 0 1.5px var(--pc,var(--blue)) inset}
-.chip:not(.on){opacity:.55}
-.chip:not(.on) .cd{background:var(--muted)}
-
-/* the map itself — stays below the sticky top bar (z-20) */
-#map{height:58vh;min-height:320px;border-radius:var(--radius);border:1px solid var(--line);
-  overflow:hidden;box-shadow:var(--shadow);position:relative;z-index:1;background:var(--wall-2)}
-.leaflet-container{font-family:inherit}
-
-/* custom pin marker (Leaflet divIcon) */
-.pin{width:32px;height:32px;border-radius:50% 50% 50% 50%;background:#fff;
-  border:3px solid var(--pc,var(--blue));display:flex;align-items:center;justify-content:center;
-  font-size:16px;line-height:1;box-shadow:0 3px 8px rgba(26,26,26,.28);position:relative}
-.pin::after{content:"";position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);
-  width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;
-  border-top:9px solid var(--pc,var(--blue))}
-
-/* popup content */
-.leaflet-popup-content{margin:12px 14px;line-height:1.4}
-.pop-t{font-weight:800;font-size:15px;margin-bottom:2px}
-.pop-c{font-weight:700;font-size:12px;margin-bottom:6px}
-.pop-h,.pop-a{font-size:13px;color:#333;margin:2px 0}
-.pop-d{display:inline-block;margin-top:8px;background:var(--blue);color:#fff !important;
-  font-weight:700;font-size:13px;padding:8px 12px;border-radius:10px}
-
-/* synced list of places */
-.placelist{margin-top:14px;display:flex;flex-direction:column;gap:10px}
-.placecard{display:flex;gap:12px;background:#fff;border:1px solid var(--line);
-  border-left:5px solid var(--pc,var(--blue));border-radius:14px;padding:12px 14px;
-  box-shadow:var(--shadow);cursor:pointer;transition:transform .12s ease,background .3s ease}
-.placecard:active{transform:scale(.99)}
-.placecard.flash{background:#fff7e6}
-.pc-ic{font-size:22px;flex:0 0 auto;line-height:1.3}
-.pc-body{flex:1;min-width:0}
-.pc-name{font-weight:700;font-size:15px}
-.pc-note{color:#333;font-size:13.5px;margin:2px 0}
-.pc-meta{color:var(--muted);font-size:12.5px;margin-top:3px}
-.pc-dir{display:inline-block;margin-top:8px;font-weight:700;font-size:13px;color:var(--blue)}
