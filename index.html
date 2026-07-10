@@ -1,52 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#2364ff">
-  <title>Welcome to Buinho</title>
-  <meta name="description" content="Pocket guide for artists in residence at Buinho FabLab, Messejana.">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-  <link rel="icon" href="icons/icon-192.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Asap:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <!-- Leaflet (OpenStreetMap map engine — free, no API key) -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-  <link rel="stylesheet" href="css/styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2364ff">
+<title>Welcome to Buinho</title>
+<meta name="description" content="Pocket guide for artists in residence at Buinho FabLab, Messejana, Alentejo.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Asap:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<!-- Leaflet 1.9.4 (map engine — free, no API key). Tiles = CARTO Positron. -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <header class="topbar">
-    <button id="backbtn" class="back" style="visibility:hidden">‹</button>
-    <span class="brand"><span class="dot"></span><span id="brand-name">Welcome to Buinho</span></span>
-    <span class="spacer"></span>
-    <div class="lang">
-      <button data-l="en" class="on">EN</button>
-      <button data-l="pt">PT</button>
-    </div>
-  </header>
 
-  <main class="app">
-    <section id="view-home" class="view active"></section>
-    <section id="view-detail" class="view"></section>
-  </main>
+<!-- ===== SVG DEFS: azulejo tile motifs (rebuilt from Polina, Main palette) ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <!-- woven cross / basketweave tile -->
+  <g id="az-weave">
+    <rect x="6"  y="20" width="36" height="9" rx="1.5" transform="rotate(45 24 24)"/>
+    <rect x="6"  y="20" width="36" height="9" rx="1.5" transform="rotate(-45 24 24)"/>
+    <rect x="19" y="19" width="10" height="10" rx="1.5"/>
+  </g>
+  <!-- lozenge / diamond ring -->
+  <g id="az-diamond">
+    <path d="M24 3 L45 24 L24 45 L3 24 Z" fill="none" stroke-width="8" stroke-linejoin="round"/>
+  </g>
+  <!-- 2x2 circles -->
+  <g id="az-quatre">
+    <circle cx="15" cy="15" r="10"/><circle cx="33" cy="15" r="10"/>
+    <circle cx="15" cy="33" r="10"/><circle cx="33" cy="33" r="10"/>
+  </g>
+</defs></svg>
 
-  <nav class="bottombar">
-    <div class="inner">
-      <button data-go="home" class="on"><span class="bi">🏠</span>Home</button>
-      <button data-go="fablab"><span class="bi">🛠️</span>FabLab</button>
-      <button data-go="checkin"><span class="bi">✅</span>Check-in</button>
-      <button data-go="contacts"><span class="bi">☎️</span>SOS</button>
-    </div>
-  </nav>
+<header class="topbar">
+  <button id="backbtn" class="back">‹ Home</button>
+  <span class="brand" id="brand">
+    <svg class="mk" viewBox="0 0 48 48"><use href="#az-weave" fill="#2364ff"/></svg>
+    <span id="brandname">Welcome to Buinho</span>
+  </span>
+  <span class="spacer"></span>
+  <div class="lang">
+    <button data-l="en" class="on">EN</button>
+    <button data-l="pt">PT</button>
+  </div>
+</header>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="js/content.js"></script>
-  <script src="js/app.js"></script>
+<main class="app">
+  <section id="v-home" class="view active"></section>
+  <section id="v-detail" class="view"></section>
+  <section id="v-map" class="view"></section>
+</main>
+
+<nav class="bottombar"><div class="inner">
+  <button data-go="home" class="on"><svg viewBox="0 0 48 48"><use href="#az-weave"/></svg>Index</button>
+  <button data-go="map"><svg viewBox="0 0 48 48"><use href="#az-diamond" fill="none" stroke="currentColor"/></svg>Map</button>
+  <button data-go="checkin"><svg viewBox="0 0 48 48"><use href="#az-quatre"/></svg>Check-in</button>
+  <button data-go="contacts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/></svg>SOS</button>
+</div></nav>
+
+<!-- Leaflet engine, then app files (content → spots → app). Paths RELATIVE (GitHub Pages subpath). -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="js/content.js"></script>
+<script src="js/spots.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
