@@ -178,10 +178,38 @@ function drawMarkers(){
     LMARKERS[s.id]=m;
   });
 }
+/* Centro de Messejana. O valor anterior (37.86875, -8.25120) ficava ~4 km a
+   norte da vila: a zoom 16 o mapa abria em campo aberto, sem um único pin no
+   ecrã, e só aparecia alguma coisa se o fitBounds mais abaixo tivesse 2+ pontos
+   depois do filtro. Coordenadas confirmadas contra os spots e a Wikipédia. */
+const MESSEJANA = [37.83278, -8.24278];
+
+/* Camada de tiles com dupla origem: primeiro a cópia local (./tiles/), e só se
+   essa faltar é que tenta o CARTO. Offline e fora da área descarregada, o
+   service worker devolve uma tile cinzenta em vez de um quadrado preto.
+   As tiles locais geram-se com tools/baixar-tiles.py — ver README. */
+const TileComFallback = L.TileLayer.extend({
+  createTile: function(coords, done){
+    const img = document.createElement('img');
+    img.alt = '';
+    const local  = './tiles/' + coords.z + '/' + coords.x + '/' + coords.y + '.png';
+    const remoto = 'https://a.basemaps.cartocdn.com/light_all/' +
+                   coords.z + '/' + coords.x + '/' + coords.y + '.png';
+    let caiuParaRemoto = false;
+    img.onload  = () => done(null, img);
+    img.onerror = () => {
+      if (!caiuParaRemoto) { caiuParaRemoto = true; img.src = remoto; }
+      else done(new Error('tile indisponível'), img);
+    };
+    img.src = local;
+    return img;
+  }
+});
+
 function initLeaflet(){
-  if(!window.L){document.getElementById("leaflet").innerHTML='<div style="padding:20px;color:#5a5a5a;font-size:14px">Mapa a carregar… (precisa de internet)</div>';return;}
-  LMAP=L.map("leaflet",{zoomControl:true,attributionControl:false,scrollWheelZoom:false}).setView([37.86875,-8.25120],16);
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",{maxZoom:20,subdomains:"abcd"}).addTo(LMAP);
+  if(!window.L){document.getElementById("leaflet").innerHTML='<div style="padding:20px;color:#5a5a5a;font-size:14px">Mapa indisponível.</div>';return;}
+  LMAP=L.map("leaflet",{zoomControl:true,attributionControl:false,scrollWheelZoom:false}).setView(MESSEJANA,16);
+  new TileComFallback('', {maxZoom:19, minZoom:13}).addTo(LMAP);
   L.control.attribution({prefix:false}).addAttribution('© OpenStreetMap · © CARTO').addTo(LMAP);
   drawMarkers();
   const pts=SPOTS.filter(s=>!mapFilter||s.cat===mapFilter).map(s=>[s.lat,s.lon]);

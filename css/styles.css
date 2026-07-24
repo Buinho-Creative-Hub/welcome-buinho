@@ -1,7 +1,7 @@
 /* ============================================================================
    styles.css — welcome-buinho (Direcção B + azulejo, paleta Buinho Main)
    Gris → Albano, 2026-07-10. Motivos de azulejo reconstruídos em SVG (no HTML).
-   Leaflet CSS é carregado do CDN (unpkg) no index.html — aqui só o app.
+   Leaflet CSS vem de vendor/leaflet/ (local, sem CDN) — aqui só o app.
    ============================================================================ */
 :root{
   --blue:#2364ff;        /* Messejana Blue */

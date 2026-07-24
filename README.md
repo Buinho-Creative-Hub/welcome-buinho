@@ -23,14 +23,20 @@ editorial numerado, cartão ESSENTIALS sempre no topo, e assinatura de azulejo
 - **Camada interactiva:** check-in à chegada, e pedido de reserva de máquina.
   *(v1 entrega um email pronto a enviar à equipa; ver "Backend" abaixo.)*
 - **Bilingue EN/PT** com botão de troca no topo.
-- **Instalável + offline** (manifest + service worker). O mapa precisa de internet
-  (tiles); o resto do app abre offline após a 1.ª visita.
+- **Instalável e offline a sério — mapa incluído.** Depois da 1.ª visita com rede,
+  a app abre em modo avião: textos, contactos e o mapa de Messejana com os pins.
+  Zero pedidos a terceiros — fontes, motor do mapa e tiles vivem dentro do repo.
+  Pensado para quem aterra em Beja com o SIM de casa e o roaming desligado.
 
 ### Editar CONTEÚDOS (sem programar)
 Todo o texto está em **`js/content.js`**. Cada texto tem versão `en` e `pt`. Muda o
 texto entre aspas, mantém vírgulas e parêntesis. Preenche os campos marcados com
-`[•••]` (morada, Wi-Fi, telefones). Depois de editar, faz commit / upload — sobe o
-número de `CACHE` em `service-worker.js` para forçar refresh em todos os telemóveis.
+`[•••]` (morada, Wi-Fi, telefones). Depois de editar, faz commit / upload — e é só.
+
+> **Já não é preciso subir o número do `CACHE` à mão.** O service worker passou a ser
+> rede-primeiro: quem tiver rede vê sempre a versão mais recente, e a cache serve só
+> para quando não há rede. Antes era cache-primeiro, e um telemóvel que já tivesse a
+> app ficava preso à morada velha até alguém se lembrar desse passo manual.
 
 ### Editar o MAPA (sem programar o mapa)
 Os pontos do mapa vivem em **`js/spots.js`** — a "matriz" editável. Cada ponto tem
@@ -45,6 +51,25 @@ cola o primeiro em `lat:` e o segundo em `lon:`. Os horários mudam-se no campo 
 `spots.js` — aposenta o Google My Map antigo. As coordenadas actuais são pontos de
 partida aproximados; vale validar cada pin uma vez.
 
+### O MAPA OFFLINE — o único passo manual
+As imagens do mapa (tiles) vivem em `tiles/`. Se essa pasta estiver vazia, o mapa
+funciona na mesma **mas só com internet**. Para o pôr a funcionar em modo avião,
+corre uma vez, a partir da raiz do repo:
+
+```bash
+python3 tools/baixar-tiles.py
+git add tiles && git commit -m "chore: tiles offline de Messejana" && git push
+```
+
+São ~270 imagens, à volta de 3 MB, zoom 14 a 18 sobre a vila. Demora menos de um
+minuto. Repetir só se a área ou os zooms mudarem (constantes no topo do script).
+
+Fora da área descarregada, e estando offline, o mapa mostra cinzento em vez de
+quadrados pretos. Havendo rede, vai buscar ao CARTO como antes.
+
+*Atribuição:* dados © OpenStreetMap (ODbL), desenho © CARTO. O crédito está visível
+no canto do mapa e tem de lá ficar, também na cópia offline.
+
 ### Backend (v1.1 — opcional)
 Check-in e reservas produzem hoje um **email pronto a enviar**. Para recepção
 automática: ligar um micro-backend Flask (`/api/checkin`, `/api/reserve`) com escrita
@@ -54,8 +79,12 @@ também da fase com backend.
 ### Stack & deploy
 HTML + CSS + JS vanilla, sem build step. Serve como **site estático** / GitHub Pages
 (caminhos relativos — funciona no subcaminho `/welcome-buinho/`). Ficheiros:
-`index.html` · `css/styles.css` · `js/content.js` · `js/spots.js` · `js/app.js` ·
-`manifest.webmanifest` · `service-worker.js` · `tools/kml_to_spots.py`.
+`index.html` · `css/styles.css` · `css/fonts.css` · `js/content.js` · `js/spots.js` ·
+`js/app.js` · `manifest.webmanifest` · `service-worker.js` · `tools/kml_to_spots.py` ·
+`tools/baixar-tiles.py`.
+
+Servidos localmente, de propósito (nunca de CDN): `fonts/` (Asap variável, SIL OFL) ·
+`vendor/leaflet/` (Leaflet 1.9.4, BSD-2) · `tiles/` (mapa de Messejana).
 
 ---
 
@@ -70,4 +99,11 @@ editorial index, ESSENTIALS card on top, azulejo-tile signature in the Buinho Ma
 `js/spots.js` — each point has `id, cat, lat, lon, name, hours, note`; correct a pin by
 right-clicking in Google/OSM and pasting the coordinates, or edit in Google My Maps and
 run `tools/kml_to_spots.py`. Map engine: Leaflet + CARTO Positron tiles (no API key).
+
+**Genuinely offline, map included.** Fonts, map engine and map tiles are all served
+from the repo — no third-party requests at all — so the app opens in airplane mode
+after the first visit. Tiles are not in git by default: run `python3 tools/baixar-tiles.py`
+once and commit the `tiles/` folder (~270 tiles, ~3 MB, zooms 14–18 over the village).
+Map data © OpenStreetMap (ODbL), style © CARTO — attribution stays visible offline too.
+
 Static site / GitHub Pages, relative paths, CC-BY-SA 4.0 · Buinho FabLab, Messejana, Alentejo.
