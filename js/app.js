@@ -81,7 +81,7 @@ const DETAIL={
     d.blocks.forEach(bk=>v.appendChild(block(bk.t,`<p>${esc(t(bk.b))}</p>`)));
     const a=el("button","btn ghost",t(d.mapLabel)+" →");a.onclick=()=>openMap("fablab");v.appendChild(a);return v;},
   house(){const d=C.house,v=el("div");v.appendChild(head(secTitle("house"),d.intro));
-    v.appendChild(block({en:"Wi-Fi",pt:"Wi-Fi"},`<div class="kv"><span class="k">SSID</span><span class="v">${esc(d.wifi.net)}</span></div><div class="kv"><span class="k">Password</span><span class="v">${esc(d.wifi.pass)}</span></div>`));
+    v.appendChild(block({en:"Wi-Fi",pt:"Wi-Fi"},`<div class="kv"><span class="k">SSID</span><span class="v">${esc(d.wifi.net)}</span></div><div class="kv"><span class="k">Password</span><span class="v">${esc(d.wifi.pass)}</span></div>${d.wifi.note?`<p class="note">${esc(t(d.wifi.note))}</p>`:""}`));
     const r=el("div","block");r.appendChild(el("h3",null,LANG()==="pt"?"Regras da casa":"House rules"));
     const ul=el("ul","rules");t(d.rules).forEach(x=>ul.appendChild(el("li",null,esc(x))));r.appendChild(ul);v.appendChild(r);return v;},
   fablab(){const d=C.fablab,v=el("div");v.appendChild(head(secTitle("fablab"),d.intro));
@@ -94,7 +94,12 @@ const DETAIL={
   contacts(){const d=C.contacts,v=el("div");v.appendChild(head(secTitle("contacts")));
     const sos=el("div","sos");sos.innerHTML=`<div class="n">112</div><div><strong>${esc(t(d.emgLabel))}</strong></div>`;v.appendChild(sos);
     const call=el("a","btn red","📞 112");call.href="tel:112";v.appendChild(call);
-    const ppl=el("div","block");ppl.style.marginTop="16px";ppl.appendChild(el("h3",null,LANG()==="pt"?"Equipa":"Team"));
+    if(d.whatsapp){const wa=el("div","block");wa.style.marginTop="16px";
+      wa.appendChild(el("h3",null,t(d.whatsapp.label)));
+      if(d.whatsapp.note)wa.appendChild(el("p",null,esc(t(d.whatsapp.note))));
+      const wb=el("a","btn",t(d.whatsapp.cta)+" →");wb.href=d.whatsapp.url;wb.target="_blank";wb.rel="noopener";wa.appendChild(wb);
+      v.appendChild(wa);}
+    const ppl=el("div","block");ppl.style.marginTop="16px";ppl.appendChild(el("h3",null,d.peopleLabel?t(d.peopleLabel):(LANG()==="pt"?"Equipa":"Team")));
     d.people.forEach(p=>{const row=el("div","kv");row.innerHTML=`<span class="k">${esc(t(p.r))} · ${esc(p.nm)}</span><a class="v" href="tel:${esc(p.ph)}">${esc(p.ph)}</a>`;ppl.appendChild(row);});v.appendChild(ppl);
     const pr=el("div","block");pr.appendChild(el("h3",null,LANG()==="pt"?"Prático":"Practical"));
     d.practical.forEach(x=>{const row=el("div","kv");row.innerHTML=`<span class="k">${esc(t(x.l))}</span><span class="v">${esc(t(x.v))}</span>`;pr.appendChild(row);});v.appendChild(pr);return v;},
