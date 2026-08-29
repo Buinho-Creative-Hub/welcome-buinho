@@ -103,6 +103,7 @@ const DETAIL={
     d.people.forEach(p=>{const row=el("div","kv");row.innerHTML=`<span class="k">${esc(t(p.r))} · ${esc(p.nm)}</span><a class="v" href="tel:${esc(p.ph)}">${esc(p.ph)}</a>`;ppl.appendChild(row);});v.appendChild(ppl);
     return v;},
   local(){const v=el("div");v.appendChild(head(secTitle("local"),C.local.intro));
+    if(C.local.blocks)C.local.blocks.forEach(bk=>v.appendChild(block(bk.t,`<p>${esc(t(bk.b))}</p>`)));
     v.insertAdjacentHTML("beforeend",frieze("#159a6b"));
     const openBtn=el("button","btn","🗺 "+(LANG()==="pt"?"Abrir o mapa de Messejana":"Open the Messejana map"));openBtn.onclick=()=>go("map");v.appendChild(openBtn);
     const ul=el("div");ul.style.marginTop="8px";

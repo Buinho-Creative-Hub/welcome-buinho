@@ -58,5 +58,22 @@ const C = {
     people:[{r:{en:"Director",pt:"Diretor"},nm:"Carlos Alcobia",ph:"+351 918 283 288"},
       {r:{en:"Production / admin",pt:"Produção / admin"},nm:"Mónica Reis",ph:"+351 939 760 933"},
       {r:{en:"FabLab manager",pt:"Responsável FabLab"},nm:"Hugo Camacho",ph:"+351 935 088 362"}]},
-  local:{intro:{en:"Messejana is small and warm. Tap a place to see it on the map.",pt:"Messejana é pequena e acolhedora. Toca num sítio para o ver no mapa."}}
+  local:{intro:{en:"Messejana is small and warm. Here's how to get around, eat, and settle in. Tap a place below to see it on the map.",pt:"Messejana é pequena e acolhedora. Aqui fica como te moveres, comeres e instalares. Toca num sítio em baixo para o ver no mapa."},
+    blocks:[
+      {t:{en:"Getting around",pt:"Transportes"},b:{
+        en:"Buses run Monday–Friday only (none on weekends or public holidays) — arrive 30 min early. To Aljustrel: 8:56am, back 4:58pm. To Beja: 8:56am, back 4:10pm. To Zambujeira do Mar (the coast): 5:10pm, back 6:40am — good for a weekend by the sea. To Lisbon: taxi to Funcheira station (~40€) then train (cp.pt), or bus from Aljustrel (rede-expressos.pt). Ask us to book a taxi in advance.",
+        pt:"Autocarros só de 2ª a 6ª (nenhum a fins de semana ou feriados) — chega 30 min antes. Para Aljustrel: 8:56, volta 16:58. Para Beja: 8:56, volta 16:10. Para Zambujeira do Mar (o mar): 17:10, volta 6:40 — bom para um fim de semana na praia. Para Lisboa: táxi até à estação de Funcheira (~40€) e comboio (cp.pt), ou autocarro de Aljustrel (rede-expressos.pt). Pede-nos para reservar o táxi com antecedência."}},
+      {t:{en:"Food & groceries",pt:"Comida e mercearia"},b:{
+        en:"Grocery shops on Rua de Aljustrel, Rua de Alvalade and Rua da Conceição: Mon–Fri 9am–1pm & 3pm–7pm, Sat 9am–1pm, closed Sunday. Vans drive through honking: fruit & veg on Tuesday, Thursday and Sunday (a red and a white truck); fresh fish on Tuesday, Thursday and Saturday; bread most mornings 8:30–9am. For bigger supermarkets (Pingo Doce, Intermarché, Continente) go to Aljustrel. Cash is handy — there's an ATM in town; a couple of shops and Bangula take card.",
+        pt:"Mercearias na Rua de Aljustrel, Rua de Alvalade e Rua da Conceição: 2ª–6ª 9h–13h e 15h–19h, Sáb 9h–13h, Dom fechado. Carrinhas passam a buzinar: fruta e legumes à 3ª, 5ª e Dom (uma vermelha e uma branca); peixe fresco à 3ª, 5ª e Sáb; pão quase todas as manhãs 8h30–9h. Para supermercados maiores (Pingo Doce, Intermarché, Continente) vai a Aljustrel. Dinheiro dá jeito — há multibanco na vila; algumas lojas e o Bangula aceitam cartão."}},
+      {t:{en:"Eating out",pt:"Comer fora"},b:{
+        en:"Faustino café — opposite the gas station; one dish a day, different each day, closed Sunday. Bangula — full meals, café from 9am, lunch from 12pm, dinner at 7:30pm, open Tuesday–Sunday (closed Monday).",
+        pt:"Café Faustino — em frente à bomba de gasolina; um prato por dia, diferente a cada dia, fecha Domingo. Bangula — refeições completas, café das 9h, almoço a partir das 12h, jantar às 19h30, aberto de 3ª a Domingo (fecha 2ª)."}},
+      {t:{en:"Rubbish",pt:"Lixo"},b:{
+        en:"The bin lorry passes on Tuesday, Thursday and Sunday evenings. Put your bin out by the road in front of the house at the end of the day. Separate: yellow (plastic/metal), blue (paper), green (glass), brown (organic).",
+        pt:"O camião do lixo passa às terças, quintas e domingos à noite. Põe o contentor à beira da estrada, à frente da casa, ao fim do dia. Separa: amarelo (plástico/metal), azul (papel), verde (vidro), castanho (orgânico)."}},
+      {t:{en:"Swimming pool",pt:"Piscina"},b:{
+        en:"Rua do Município, Mon–Fri 10am–7pm — summer months only.",
+        pt:"Rua do Município, 2ª–6ª 10h–19h — só nos meses de verão."}}
+    ]}
 };
