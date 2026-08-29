@@ -57,7 +57,6 @@ const C = {
     peopleLabel:{en:"If you need to call",pt:"Se precisares de ligar"},
     people:[{r:{en:"Director",pt:"Diretor"},nm:"Carlos Alcobia",ph:"+351 918 283 288"},
       {r:{en:"Production / admin",pt:"Produção / admin"},nm:"Mónica Reis",ph:"+351 939 760 933"},
-      {r:{en:"FabLab manager",pt:"Responsável FabLab"},nm:"Hugo Camacho",ph:"+351 935 088 362"}],
-    practical:[{l:{en:"Fire safety",pt:"Segurança contra incêndio"},v:{en:"Extinguisher by the FabLab door; assembly point in the front yard.",pt:"Extintor junto à porta do FabLab; ponto de encontro no pátio."}}]},
+      {r:{en:"FabLab manager",pt:"Responsável FabLab"},nm:"Hugo Camacho",ph:"+351 935 088 362"}]},
   local:{intro:{en:"Messejana is small and warm. Tap a place to see it on the map.",pt:"Messejana é pequena e acolhedora. Toca num sítio para o ver no mapa."}}
 };

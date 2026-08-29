@@ -101,8 +101,7 @@ const DETAIL={
       v.appendChild(wa);}
     const ppl=el("div","block");ppl.style.marginTop="16px";ppl.appendChild(el("h3",null,d.peopleLabel?t(d.peopleLabel):(LANG()==="pt"?"Equipa":"Team")));
     d.people.forEach(p=>{const row=el("div","kv");row.innerHTML=`<span class="k">${esc(t(p.r))} · ${esc(p.nm)}</span><a class="v" href="tel:${esc(p.ph)}">${esc(p.ph)}</a>`;ppl.appendChild(row);});v.appendChild(ppl);
-    const pr=el("div","block");pr.appendChild(el("h3",null,LANG()==="pt"?"Prático":"Practical"));
-    d.practical.forEach(x=>{const row=el("div","kv");row.innerHTML=`<span class="k">${esc(t(x.l))}</span><span class="v">${esc(t(x.v))}</span>`;pr.appendChild(row);});v.appendChild(pr);return v;},
+    return v;},
   local(){const v=el("div");v.appendChild(head(secTitle("local"),C.local.intro));
     v.insertAdjacentHTML("beforeend",frieze("#159a6b"));
     const openBtn=el("button","btn","🗺 "+(LANG()==="pt"?"Abrir o mapa de Messejana":"Open the Messejana map"));openBtn.onclick=()=>go("map");v.appendChild(openBtn);
