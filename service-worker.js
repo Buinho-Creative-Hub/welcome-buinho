@@ -19,7 +19,7 @@
    se lembrar de subir o número do CACHE à mão. Agora: se há rede, vê-se sempre o
    mais recente; a cache é só a rede de segurança para quando não há rede. */
 
-const SHELL = 'buinho-welcome-shell-v9';
+const SHELL = 'buinho-welcome-shell-v10';
 const TILES = 'buinho-welcome-tiles';      /* sem versão — ver acima */
 
 const ESTATICOS = [

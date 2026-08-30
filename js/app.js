@@ -143,7 +143,7 @@ function spotRow(s){
   const row=el("div","spot");row.dataset.id=s.id;
   row.innerHTML=`<span class="sq" style="background:${c.color}">${catGlyph(s.cat)}</span>
     <div><div class="nm">${esc(t(s.name))}</div><div class="meta">${esc(t(c.label))} · ${esc(t(s.hours))} — ${esc(t(s.note))}</div></div>
-    <a class="go" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}&travelmode=walking" target="_blank" rel="noopener">${LANG()==="pt"?"Como chegar":"Directions"} →</a>`;
+    <a class="go" href="https://maps.google.com/?q=Messejana,Aljustrel" target="_blank" rel="noopener">${LANG()==="pt"?"Ir":"Go"} →</a>`;
   row.onclick=e=>{if(e.target.closest('.go'))return;openMap(s.id);};
   return row;
 }
