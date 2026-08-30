@@ -143,7 +143,7 @@ function spotRow(s){
   const row=el("div","spot");row.dataset.id=s.id;
   row.innerHTML=`<span class="sq" style="background:${c.color}">${catGlyph(s.cat)}</span>
     <div><div class="nm">${esc(t(s.name))}</div><div class="meta">${esc(t(c.label))} · ${esc(t(s.hours))} — ${esc(t(s.note))}</div></div>
-    <a class="go" href="https://maps.google.com/?q=Messejana,Aljustrel" target="_blank" rel="noopener">${LANG()==="pt"?"Ir":"Go"} →</a>`;
+    <a class="go" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}&travelmode=walking" target="_blank" rel="noopener">${LANG()==="pt"?"Como chegar":"Directions"} →</a>`;
   row.onclick=e=>{if(e.target.closest('.go'))return;openMap(s.id);};
   return row;
 }
@@ -152,6 +152,8 @@ function renderMap(){
   const v=document.getElementById("v-map");v.innerHTML="";LMAP=null;LMARKERS={};
   v.appendChild(head({en:"Messejana map",pt:"Mapa de Messejana"},{en:"The village, from your door. Tap a pin or a place.",pt:"A aldeia, a partir da tua porta. Toca num pino ou num sítio."}));
   const wrap=el("div","mapwrap");wrap.innerHTML='<div id="leaflet"></div>';v.appendChild(wrap);
+  const locBtn=el("button","btn ghost","📍 "+(LANG()==="pt"?"Onde estou":"Where am I"));
+  locBtn.style.marginTop="8px";locBtn.onclick=()=>locateMe(locBtn);v.appendChild(locBtn);
   // category filters
   const cats=el("div","cats");
   const all=el("span","cat"+(mapFilter===null?" on":""),(LANG()==="pt"?"Todos":"All"));all.onclick=()=>{mapFilter=null;drawMarkers();refreshList();cats.querySelectorAll('.cat').forEach(x=>x.classList.remove('on'));all.classList.add('on');};cats.appendChild(all);
@@ -221,6 +223,27 @@ function initLeaflet(){
   if(pts.length>1){try{LMAP.fitBounds(pts,{padding:[38,38],maxZoom:16});}catch(e){}}
   setTimeout(()=>LMAP&&LMAP.invalidateSize(),200);
 }
+let USERMARK=null, USERRING=null;
+function locateMe(btn){
+  if(!LMAP||!navigator.geolocation){return;}
+  const lbl=btn.textContent;
+  btn.textContent=(LANG()==="pt"?"📍 A localizar…":"📍 Locating…");btn.disabled=true;
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const ll=[pos.coords.latitude,pos.coords.longitude];
+    const arrow='<svg viewBox="0 0 40 40" width="40" height="40" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="15" fill="#ffffff" stroke="#2364ff" stroke-width="3"/><path d="M20 8 Q21.1 8 21.7 9.9 L26.5 24.8 Q27 26.7 25.1 26.1 L20.8 22.9 Q20 22.5 19.2 22.9 L14.9 26.1 Q13 26.7 13.5 24.8 L18.3 9.9 Q18.9 8 20 8 Z" fill="#2364ff" stroke="#2364ff" stroke-width="1.3" stroke-linejoin="round"/></svg>';
+    const ic=L.divIcon({className:"",html:arrow,iconSize:[40,40],iconAnchor:[20,20]});
+    if(USERMARK)LMAP.removeLayer(USERMARK);
+    if(USERRING)LMAP.removeLayer(USERRING);
+    USERRING=L.circle(ll,{radius:Math.max(pos.coords.accuracy||30,25),color:"#2364ff",weight:1,fillColor:"#2364ff",fillOpacity:0.10}).addTo(LMAP);
+    USERMARK=L.marker(ll,{icon:ic,zIndexOffset:1000}).addTo(LMAP);
+    LMAP.setView(ll,17);
+    btn.textContent=lbl;btn.disabled=false;
+  },err=>{
+    btn.textContent=lbl;btn.disabled=false;
+    alert(LANG()==="pt"?"Não consegui obter a tua localização. Verifica se deste permissão ao browser.":"Couldn't get your location. Check that you allowed the browser to use it.");
+  },{enableHighAccuracy:true,timeout:10000,maximumAge:30000});
+}
+
 function openMap(id){mapSel=id||null;mapFilter=null;go("map");}
 
 /* ================= router ================= */
