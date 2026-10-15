@@ -130,30 +130,45 @@ const DETAIL={
   checkin(){const v=el("div");const pt=LANG()==="pt";
     v.appendChild(head(secTitle("checkin"),{en:"Arrived, something wrong in the house, a question, or feedback — tell us here. It goes straight to the team.",pt:"Chegaste, há um problema na casa, uma dúvida ou feedback — diz-nos aqui. Vai direto para a equipa."}));
     const tipos=[["arrived",{en:"I've arrived",pt:"Cheguei"}],["problem",{en:"Problem in the house",pt:"Problema na casa"}],["question",{en:"Question",pt:"Dúvida"}],["feedback",{en:"Feedback",pt:"Feedback"}]];
-    const eu=quemSou();let tipo="arrived",nota=0;
+    const eu=quemSou();let tipo="arrived";
     const f=el("div");f.innerHTML=`
       <label class="f">${pt?"Sobre o quê?":"What's it about?"}</label><div class="tp" id="eq-tipo"></div>
       <div class="two"><div><label class="f">${pt?"Nome":"Name"}</label><input id="eq-nome" autocomplete="name"></div>
       <div><label class="f">${pt?"Casa":"House"}</label><select id="eq-casa">${CASAS.map(c=>`<option>${esc(t(c))}</option>`).join("")}</select></div></div>
-      <div id="eq-nota-w" style="display:none"><label class="f">${pt?"Como correu a estadia? (1–5)":"How was your stay? (1–5)"}</label><div class="tp" id="eq-nota"></div></div>
-      <label class="f" id="eq-msg-l"></label><textarea id="eq-msg" rows="3"></textarea>
+      <div id="eq-fb" style="display:none">
+        <p class="note" style="margin:14px 0 4px">${pt?"De 1 (mau) a 5 (excelente). Salta o que não se aplica.":"From 1 (poor) to 5 (excellent). Skip what doesn't apply."}</p>
+        <div id="eq-dims"></div>
+        <label class="f">${pt?"Recomendarias o Buinho a outro artista?":"Would you recommend Buinho to another artist?"}</label><div class="tp" id="eq-rec"></div>
+        <label class="f">${pt?"O que correu melhor?":"What worked best?"}</label><textarea id="eq-bem" rows="2"></textarea>
+        <label class="f">${pt?"O que devíamos mudar?":"What should we change?"}</label><textarea id="eq-mudar" rows="2"></textarea>
+      </div>
+      <div id="eq-msg-w"><label class="f" id="eq-msg-l"></label><textarea id="eq-msg" rows="3"></textarea></div>
       <input id="eq-hp" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">`;
     v.appendChild(f);
-    const tp=f.querySelector("#eq-tipo"),msgL=f.querySelector("#eq-msg-l"),notaW=f.querySelector("#eq-nota-w");
+    const tp=f.querySelector("#eq-tipo"),msgL=f.querySelector("#eq-msg-l"),fbW=f.querySelector("#eq-fb"),msgW=f.querySelector("#eq-msg-w");
     const pinta=()=>{tp.querySelectorAll(".cat").forEach(b=>b.classList.toggle("on",b.dataset.t===tipo));
-      notaW.style.display=tipo==="feedback"?"block":"none";
-      msgL.textContent=tipo==="arrived"?(pt?"Alguma nota? (opcional)":"Anything to add? (optional)")
-        :tipo==="feedback"?(pt?"O que correu bem e o que podemos melhorar?":"What went well, and what could we improve?")
-        :(pt?"Conta-nos numa frase":"Tell us in a sentence");};
+      fbW.style.display=tipo==="feedback"?"block":"none";msgW.style.display=tipo==="feedback"?"none":"block";
+      msgL.textContent=tipo==="arrived"?(pt?"Alguma nota? (opcional)":"Anything to add? (optional)"):(pt?"Conta-nos numa frase":"Tell us in a sentence");};
     tipos.forEach(([k,l])=>{const b=el("span","cat",esc(t(l)));b.dataset.t=k;b.onclick=()=>{tipo=k;pinta();};tp.appendChild(b);});
-    const nt=f.querySelector("#eq-nota");[1,2,3,4,5].forEach(n=>{const b=el("span","cat",String(n));b.onclick=()=>{nota=n;nt.querySelectorAll(".cat").forEach(x=>x.classList.toggle("on",x===b));};nt.appendChild(b);});
+    const aval={};let rec="";
+    const dims=f.querySelector("#eq-dims");
+    FB_DIMS.forEach(([k,l])=>{const row=el("div","fb-row");row.appendChild(el("span","fb-l",esc(t(l))));const pills=el("div","tp");
+      [1,2,3,4,5].forEach(n=>{const b=el("span","cat",String(n));b.onclick=()=>{aval[k]=(aval[k]===n?undefined:n);pills.querySelectorAll(".cat").forEach(x=>x.classList.toggle("on",+x.textContent===aval[k]));};pills.appendChild(b);});
+      row.appendChild(pills);dims.appendChild(row);});
+    const rc=f.querySelector("#eq-rec");[["sim",{en:"Yes",pt:"Sim"}],["talvez",{en:"Maybe",pt:"Talvez"}],["nao",{en:"No",pt:"Não"}]].forEach(([k,l])=>{const b=el("span","cat",esc(t(l)));b.onclick=()=>{rec=k;rc.querySelectorAll(".cat").forEach(x=>x.classList.toggle("on",x===b));};rc.appendChild(b);});
     f.querySelector("#eq-nome").value=eu.nome||"";if(eu.casa)f.querySelector("#eq-casa").value=eu.casa;pinta();
     const btn=el("button","btn",(pt?"Enviar à equipa":"Send to the team")+" →");const done=el("div","done");
-    btn.onclick=()=>{const nome=val("eq-nome").trim(),casa=val("eq-casa"),msg=val("eq-msg").trim();
+    btn.onclick=()=>{const nome=val("eq-nome").trim(),casa=val("eq-casa");let msg=val("eq-msg").trim();
       if(!nome){done.classList.add("show");done.textContent=pt?"Escreve o teu nome, por favor.":"Please add your name.";return;}
-      if(tipo!=="arrived"&&!msg&&!(tipo==="feedback"&&nota)){done.classList.add("show");done.textContent=pt?"Escreve uma frase, por favor.":"Please write a sentence.";return;}
+      let extra={};
+      if(tipo==="feedback"){const ns=Object.values(aval).filter(Boolean),bem=val("eq-bem"),mudar=val("eq-mudar");
+        if(!ns.length&&!bem&&!mudar){done.classList.add("show");done.textContent=pt?"Dá pelo menos uma nota ou escreve uma frase.":"Give at least one score or write a sentence.";return;}
+        msg=[bem&&("Bem: "+bem),mudar&&("Mudar: "+mudar)].filter(Boolean).join(" | ");
+        extra={aval:Object.fromEntries(FB_DIMS.map(([k])=>[k,aval[k]||""])),recomenda:rec,
+          nota:ns.length?Math.round(ns.reduce((a,b)=>a+b,0)/ns.length*10)/10:""};}
+      else if(tipo!=="arrived"&&!msg){done.classList.add("show");done.textContent=pt?"Escreve uma frase, por favor.":"Please write a sentence.";return;}
       guardarQuemSou(nome,casa);btn.disabled=true;
-      enviarEquipa({tipo,nome,casa,mensagem:msg,nota:tipo==="feedback"?nota:"",hp:val("eq-hp")},done,()=>{btn.disabled=false;f.querySelector("#eq-msg").value="";});};
+      enviarEquipa(Object.assign({tipo,nome,casa,mensagem:msg,nota:"",hp:val("eq-hp")},extra),done,()=>{btn.disabled=false;["eq-msg","eq-bem","eq-mudar"].forEach(i=>{const x=f.querySelector("#"+i);if(x)x.value="";});});};
     v.appendChild(btn);v.appendChild(done);
     v.appendChild(el("p","ag-stamp",esc(pt?"Urgência ou perigo? Usa o SOS (112).":"Emergency or danger? Use SOS (112).")));
     return v;},
@@ -296,6 +311,14 @@ const EQUIPA_WEBHOOK="https://buinho.app.n8n.cloud/webhook/welcome-air";
 const EQUIPA_WHATSAPP="351939760933";   /* Produção / admin (residências) */
 const CASAS=[{en:"Casa São João",pt:"Casa São João"},{en:"Casa da Avó",pt:"Casa da Avó"},{en:"Casa Buinho",pt:"Casa Buinho"},
   {en:"Casa da Padaria",pt:"Casa da Padaria"},{en:"Other / not staying",pt:"Outra / não estou alojado"}];
+/* Feedback: 7 dimensões curtas (1–5) + recomendação + 2 perguntas abertas. Chaves = colunas f_* na PEDIDOS AIR. */
+const FB_DIMS=[["antes",{en:"Info & contact before arriving",pt:"Informação e contacto antes de chegar"}],
+  ["chegada",{en:"Arrival & welcome",pt:"Chegada e acolhimento"}],
+  ["casa",{en:"The house (comfort, cleanliness)",pt:"A casa (conforto, limpeza)"}],
+  ["fablab",{en:"FabLab & equipment",pt:"FabLab e equipamento"}],
+  ["equipa",{en:"Support from the team",pt:"Apoio da equipa"}],
+  ["aldeia",{en:"Village & community",pt:"Aldeia e comunidade"}],
+  ["valor",{en:"Value for money",pt:"Relação qualidade/preço"}]];
 const QUEM_KEY="buinho-quem-v1";
 function quemSou(){try{return JSON.parse(localStorage.getItem(QUEM_KEY)||"{}");}catch(e){return {};}}
 function guardarQuemSou(nome,casa){try{localStorage.setItem(QUEM_KEY,JSON.stringify({nome,casa}));}catch(e){}}
@@ -303,7 +326,7 @@ const TIPO_TXT={arrived:"Cheguei",problem:"Problema na casa",question:"Dúvida",
 function enviarEquipa(d,done,fim){
   const pt=LANG()==="pt";const corpo=Object.assign({},d,{lang:LANG(),enviado:new Date().toISOString()});
   const ok=()=>{done.classList.add("show");done.textContent=pt?"✓ Enviado. A equipa já recebeu.":"✓ Sent. The team has it.";fim&&fim();};
-  const plano=()=>{const txt=`[Welcome Buinho] ${TIPO_TXT[d.tipo]||d.tipo} — ${d.nome} (${d.casa})${d.nota?" · nota "+d.nota+"/5":""}${d.mensagem?"\n"+d.mensagem:""}`;
+  const plano=()=>{const txt=`[Welcome Buinho] ${TIPO_TXT[d.tipo]||d.tipo} — ${d.nome} (${d.casa})${d.nota?" · média "+d.nota+"/5":""}${d.mensagem?"\n"+d.mensagem:""}`;
     done.classList.add("show");done.innerHTML=esc(pt?"Não consegui enviar daqui. Toca para mandar pelo WhatsApp:":"Couldn't send from here. Tap to send it on WhatsApp:")+
       ` <a class="btn ghost" style="margin-top:8px" target="_blank" rel="noopener" href="https://wa.me/${EQUIPA_WHATSAPP}?text=${encodeURIComponent(txt)}">WhatsApp →</a>`;fim&&fim();};
   fetch(EQUIPA_WEBHOOK,{method:"POST",headers:{"Content-Type":"text/plain;charset=UTF-8"},body:JSON.stringify(corpo)})
