@@ -1,7 +1,9 @@
 /* ============================================================================
    spots.js — O MAPA de Messejana (a "matriz" de pontos editáveis)
    ----------------------------------------------------------------------------
-   A EQUIPA EDITA AQUI, sem programar o mapa. Cada ponto tem:
+   FONTE PRINCIPAL: a aba «MAPA AIR» do Sheet das residências (a app lê-a e guarda cópia).
+   Este ficheiro é só a RESERVA offline, usada antes da primeira leitura do Sheet.
+   A EQUIPA EDITA NO SHEET, não aqui. Cada ponto tem:
      id, cat, lat, lon, name{en,pt}, hours{en,pt}, note{en,pt}
    e, opcional, addr (morada). O botão «Ir» abre o Google Maps na morada; sem
    morada, abre nas coordenadas lat/lon do pin.

@@ -481,6 +481,35 @@ function perguntarGuia(q){const pt=LANG()==="pt";
       return falha;}).catch(()=>falha);
 }
 
+/* ================= MAPA: lido da aba MAPA AIR (Sheet das residências); spots.js é a reserva offline ================= */
+const MAPA_CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vTuIC8nLTMgraHygpgZV8oLuoYvKs6jV3BTbzNHqKBzrM1k0KBXl0AF8824DlfkGIMV1cRxDjuGCecX/pub?gid=1008745359&single=true&output=csv";
+const MAPA_KEY="buinho-mapa-v1";
+const CAT_PT={"buinho":"buinho","lojas":"shop","loja":"shop","comer e café":"food","comer":"food","café":"food","saúde":"health","saude":"health","serviços":"money","servicos":"money","património":"culture","patrimonio":"culture","cultura":"culture","ar livre":"nature","desporto":"nature"};
+const slug=x=>String(x).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+function aplicarMapa(rows){if(!rows||rows.length<3)return false;
+  SPOTS.length=0;rows.forEach(r=>SPOTS.push(r));return true;}
+function mapaLerCSV(txt){const L=csvLinhas(txt).filter(r=>r.some(x=>x.trim()));if(L.length<2)return [];
+  const cols=L[0].map(c=>c.trim().toLowerCase()),ix=k=>cols.indexOf(k);const ids={};
+  return L.slice(1).map(r=>{const g=k=>ix(k)<0?"":(r[ix(k)]||"").trim();
+    if(/^(n[ãa]o|no|n)$/i.test(g("mostrar")))return null;
+    const cat=CAT_PT[g("categoria").toLowerCase()];const lat=parseFloat(g("lat").replace(",",".")),lon=parseFloat(g("lon").replace(",","."));
+    if(!cat||!isFinite(lat)||!isFinite(lon))return null;
+    let id=slug(g("nome_en")||g("nome_pt"))||"p";while(ids[id])id+="-2";ids[id]=1;
+    if(cat==="buinho"&&/sede|hq/i.test(g("nome_pt")+g("nome_en")))id="hq";
+    const far=Math.hypot((lat-37.8335)*111,(lon+8.244)*88)>0.7;
+    return {id,cat,lat,lon,far,addr:g("morada")||undefined,
+      name:{pt:g("nome_pt")||g("nome_en"),en:g("nome_en")||g("nome_pt")},
+      hours:{pt:g("horario_pt")||g("horario_en"),en:g("horario_en")||g("horario_pt")},
+      note:{pt:g("nota_pt")||g("nota_en"),en:g("nota_en")||g("nota_pt")}};}).filter(Boolean);}
+try{const c=JSON.parse(localStorage.getItem(MAPA_KEY)||"null");if(c&&c.rows)aplicarMapa(c.rows);}catch(e){}
+function actualizarMapa(){
+  return fetch(MAPA_CSV_URL,{cache:"no-store"}).then(r=>r.ok?r.text():"").then(txt=>{
+    const rows=mapaLerCSV(txt);if(!aplicarMapa(rows))return;
+    try{localStorage.setItem(MAPA_KEY,JSON.stringify({rows,at:new Date().toISOString()}));}catch(e){}
+    const h=(location.hash||"").slice(1);if(h==="map"||h==="house")route();
+  }).catch(()=>{});
+}
+
 /* ================= router ================= */
 function go(id){location.hash=id?("#"+id):"#home";}
 function route(){
@@ -507,6 +536,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   renderHome();route();window.addEventListener("hashchange",route);
   actualizarAgenda();
   actualizarGuia();
+  actualizarMapa();
 });
 
 /* ================= PWA: registar o service worker (offline + instalável) ================= */
