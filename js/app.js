@@ -285,7 +285,8 @@ function agCel(c){
   if(!c||c.v==null)return "";
   const v=c.v;
   if(Array.isArray(v))return p2(v[0])+":"+p2(v[1]);                       /* hora (timeofday) */
-  if(typeof v==="string"){const m=v.match(/^Date\((\d+),(\d+),(\d+)/);   /* data: mês 0-based */
+  if(typeof v==="string"){const m=v.match(/^Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+))?/);  /* mês 0-based */
+    if(m&&m[1]==="1899"&&m[4]!=null)return p2(m[4])+":"+p2(m[5]);          /* hora: o Sheets manda Date(1899,11,30,h,m,s) */
     if(m)return m[1]+"-"+p2(+m[2]+1)+"-"+p2(m[3]);
     return v.trim();}
   return c.f!=null?String(c.f):String(v);
