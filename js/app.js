@@ -80,9 +80,28 @@ const DETAIL={
   arrival(){const d=C.arrival,v=el("div");v.appendChild(head(secTitle("arrival"),d.intro));
     d.blocks.forEach(bk=>v.appendChild(block(bk.t,`<p>${esc(t(bk.b))}</p>`)));
     const a=el("button","btn ghost",t(d.mapLabel)+" →");a.onclick=()=>openMap("fablab");v.appendChild(a);return v;},
-  house(){const d=C.house,v=el("div");v.appendChild(head(secTitle("house"),d.intro));
-    v.appendChild(block({en:"Wi-Fi",pt:"Wi-Fi"},`<div class="kv"><span class="k">SSID</span><span class="v">${esc(d.wifi.net)}</span></div><div class="kv"><span class="k">Password</span><span class="v">${esc(d.wifi.pass)}</span></div>${d.wifi.note?`<p class="note">${esc(t(d.wifi.note))}</p>`:""}`));
-    const r=el("div","block");r.appendChild(el("h3",null,LANG()==="pt"?"Regras da casa":"House rules"));
+  house(){const d=C.house,v=el("div");const pt=LANG()==="pt";
+    v.appendChild(head(secTitle("house"),{en:"Practical answers about the house, Buinho and Messejana.",pt:"Respostas práticas sobre a casa, o Buinho e Messejana."}));
+    /* Perguntar ao guia (Haiku via n8n, só responde com o guia) */
+    const ask=el("div","ask");ask.innerHTML=`<label class="f">${pt?"Pergunta ao guia":"Ask the guide"}</label>
+      <div class="ask-row"><input id="ask-q" maxlength="300" placeholder="${pt?"Ex.: onde compro pão?":"E.g. where can I buy bread?"}"><button class="btn" id="ask-b">${pt?"Perguntar":"Ask"}</button></div>
+      <div class="ask-a" id="ask-a"></div>`;v.appendChild(ask);
+    const qi=ask.querySelector("#ask-q"),ab=ask.querySelector("#ask-b"),aa=ask.querySelector("#ask-a");
+    const perguntar=()=>{const q=qi.value.trim();if(q.length<3)return;ab.disabled=true;aa.className="ask-a show";aa.textContent=pt?"A pensar…":"Thinking…";
+      perguntarGuia(q).then(r=>{aa.textContent=r;}).finally(()=>{ab.disabled=false;});};
+    ab.onclick=perguntar;qi.onkeydown=e=>{if(e.key==="Enter")perguntar();};
+    const linhas=guiaVisivel();
+    if(linhas.length){
+      const ordem=[];linhas.forEach(g=>{if(!ordem.includes(g.secao))ordem.push(g.secao);});
+      ordem.forEach(sec=>{const bl=el("div","block");bl.appendChild(el("h3",null,esc(SEC_NOME[sec]?t(SEC_NOME[sec]):sec)));
+        linhas.filter(g=>g.secao===sec).forEach(g=>{const det=el("details","faq");
+          const q=pt?g.pergunta:(g.pergunta_en||g.pergunta),r=pt?(g.pt||g.en):(g.en||g.pt);
+          det.innerHTML=`<summary>${esc(q)}${g.casa&&g.casa!=="todas"?` <span class="todo">${esc(g.casa)}</span>`:""}</summary><p>${esc(r)}</p>`;bl.appendChild(det);});
+        v.appendChild(bl);});
+      return v;}
+    /* sem guia (offline e sem cópia): conteúdo de base */
+    v.appendChild(block({en:"Wi-Fi",pt:"Wi-Fi"},`<div class="kv"><span class="k">SSID</span><span class="v">${esc(d.wifi.net)}</span></div><div class="kv"><span class="k">Password</span><span class="v">${esc(d.wifi.pass)}</span></div>`));
+    const r=el("div","block");r.appendChild(el("h3",null,pt?"Regras da casa":"House rules"));
     const ul=el("ul","rules");t(d.rules).forEach(x=>ul.appendChild(el("li",null,esc(x))));r.appendChild(ul);v.appendChild(r);return v;},
   fablab(){const d=C.fablab,v=el("div");v.appendChild(head(secTitle("fablab"),d.intro));
     d.machines.forEach(m=>{const tag=m.book?`<span class="mtag">${LANG()==="pt"?"reserva":"booking"}</span>`:"";
@@ -399,6 +418,49 @@ function actualizarAgenda(){
   }).catch(()=>{});
 }
 
+/* ================= GUIA AIR (aba do RESIDENCIES CONTROL MAP, publicada em CSV) + assistente ================= */
+const GUIA_CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vTuIC8nLTMgraHygpgZV8oLuoYvKs6jV3BTbzNHqKBzrM1k0KBXl0AF8824DlfkGIMV1cRxDjuGCecX/pub?gid=1761809381&single=true&output=csv";
+const GUIA_ASK_URL="https://buinho.app.n8n.cloud/webhook/welcome-air-ask";
+const GUIA_KEY="buinho-guia-v1";
+const SEC_NOME={Chegada:{en:"Arriving",pt:"Chegada"},Casa:{en:"The house",pt:"A casa"},Buinho:{en:"Buinho & FabLab",pt:"Buinho e FabLab"},
+  Messejana:{en:"Messejana",pt:"Messejana"},Ajuda:{en:"Help",pt:"Ajuda"},"Saída":{en:"Leaving",pt:"Saída"}};
+/* perguntas em EN (a coluna do Sheet tem só a pergunta em PT) */
+const PERG_EN={"Onde é o ponto de chegada?":"Where do I arrive?","Como chego desde Lisboa?":"How do I get here from Lisbon?",
+  "Como chego desde o aeroporto de Faro?":"How do I get here from Faro airport?","E se chegar fora de horas?":"What if I arrive late?",
+  "Qual é o Wi-Fi?":"What's the Wi-Fi?","Regras da casa":"House rules","Há roupa de cama e toalhas?":"Are bed linen and towels provided?",
+  "Onde lavo e seco a roupa?":"Where can I do laundry?","Como funciona a água quente?":"How does the hot water work?",
+  "Como funciona o aquecimento / ar condicionado?":"How do heating / air conditioning work?","As chaves e a fechadura têm alguma particularidade?":"Anything special about keys and locks?",
+  "Lixo: onde está o contentor e quando passa o camião?":"Rubbish: where is the bin and when is collection?","O que faço se faltar a luz ou a água?":"What if the power or water goes off?",
+  "O que é o Buinho?":"What is Buinho?","Qual é o horário do FabLab?":"What are the FabLab hours?","Como reservo uma máquina?":"How do I book a machine?",
+  "Os materiais estão incluídos?":"Are materials included?","Há apresentação final / dia aberto?":"Is there a final presentation / open studio?",
+  "Onde compro comida?":"Where can I buy food?","Onde posso comer fora?":"Where can I eat out?","Há multibanco? Aceitam cartão?":"Is there an ATM? Do places take cards?",
+  "Como me desloco (autocarros, táxi)?":"How do I get around (buses, taxi)?","Onde é a piscina?":"Where is the swimming pool?",
+  "O que vale a pena ver por perto?":"What's worth seeing nearby?","Emergência":"Emergency","Tenho um problema na casa ou uma dúvida":"I have a problem in the house or a question",
+  "O que faço antes de sair?":"What do I do before leaving?"};
+let GUIA=null;
+try{GUIA=JSON.parse(localStorage.getItem(GUIA_KEY)||"null");}catch(e){GUIA=null;}
+function guiaVisivel(){return (GUIA&&GUIA.rows||[]).filter(g=>!/^(n[ãa]o|no|n)$/i.test(g.mostrar||"")&&(g.pt||g.en));}
+function actualizarGuia(){
+  return fetch(GUIA_CSV_URL,{cache:"no-store"}).then(r=>r.text()).then(txt=>{
+    const L=csvLinhas(txt).filter(r=>r.some(x=>x.trim()));if(L.length<2)return;
+    const cols=L[0].map(c=>c.trim().toLowerCase()),ix=k=>cols.indexOf(k);
+    const rows=L.slice(1).map(r=>{const g=k=>ix(k)<0?"":(r[ix(k)]||"").trim();const p=g("pergunta");
+      return {secao:g("secao"),casa:g("casa"),pergunta:p,pergunta_en:g("pergunta_en")||PERG_EN[p]||"",pt:g("resposta_pt"),en:g("resposta_en"),mostrar:g("mostrar")};}).filter(g=>g.pergunta);
+    GUIA={rows,at:new Date().toISOString()};
+    try{localStorage.setItem(GUIA_KEY,JSON.stringify(GUIA));}catch(e){}
+    if((location.hash||"").slice(1)==="house")route();
+  }).catch(()=>{});
+}
+function idDispositivo(){try{let d=localStorage.getItem("buinho-dev");if(!d){d=(crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2));localStorage.setItem("buinho-dev",d);}return d;}catch(e){return "anon";}}
+function perguntarGuia(q){const pt=LANG()==="pt";
+  const falha=pt?"Não consegui responder agora. Usa o botão «Team» e a equipa responde-te.":"I couldn't answer right now. Use the «Team» button and the team will reply.";
+  return fetch(GUIA_ASK_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=UTF-8"},body:JSON.stringify({q,dev:idDispositivo(),lang:LANG()})})
+    .then(r=>r.ok?r.json():null).then(j=>{
+      if(j&&j.answer)return j.answer;
+      if(j&&(j.motivo==="limite_dev"||j.motivo==="limite_dia"))return pt?"Por hoje o guia já respondeu a muitas perguntas. Usa o botão «Team» para falar com a equipa.":"The guide has answered a lot of questions today. Use the «Team» button to reach the team.";
+      return falha;}).catch(()=>falha);
+}
+
 /* ================= router ================= */
 function go(id){location.hash=id?("#"+id):"#home";}
 function route(){
@@ -424,6 +486,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   document.querySelectorAll(".bottombar button").forEach(b=>b.onclick=()=>go(b.dataset.go));
   renderHome();route();window.addEventListener("hashchange",route);
   actualizarAgenda();
+  actualizarGuia();
 });
 
 /* ================= PWA: registar o service worker (offline + instalável) ================= */

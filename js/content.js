@@ -15,7 +15,7 @@ const C = {
   heroTitle:{en:["The residency,","mapped."],pt:["A residência,","mapeada."]},
   sections:[
     {id:"arrival",n:"01",title:{en:"Getting here",pt:"Como chegar"}},
-    {id:"house",n:"02",title:{en:"The house & rules",pt:"A casa e regras"}},
+    {id:"house",n:"02",title:{en:"Guide: house, Buinho & village",pt:"Guia: casa, Buinho e aldeia"}},
     {id:"fablab",n:"03",title:{en:"The FabLab",pt:"O FabLab"}},
     {id:"schedule",n:"04",title:{en:"Your week",pt:"A tua semana"}},
     {id:"contacts",n:"05",title:{en:"Contacts & safety",pt:"Contactos e segurança"}},
