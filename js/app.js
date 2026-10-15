@@ -317,7 +317,7 @@ function enviarEquipa(d,done,fim){
    Offline: guarda a última cópia boa em localStorage; sem nenhuma, mostra o ritmo típico do content.js. */
 /* Fonte definitiva: aba AGENDA AIR do RESIDENCIES CONTROL MAP, publicada na web em CSV (só essa aba; o ficheiro fica privado).
    Cola aqui o link «Publicar na Web → CSV». Enquanto estiver vazio, a app lê o Sheet provisório (gviz). */
-const AGENDA_CSV_URL="";
+const AGENDA_CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vTuIC8nLTMgraHygpgZV8oLuoYvKs6jV3BTbzNHqKBzrM1k0KBXl0AF8824DlfkGIMV1cRxDjuGCecX/pub?gid=1366786598&single=true&output=csv";
 const AGENDA_URL="https://docs.google.com/spreadsheets/d/1svol-yvGRVloQFeEGtUDbHupX_fan8OkiJh_AQAUKRc/gviz/tq?tqx=out:json&headers=1";
 const AGENDA_KEY="buinho-agenda-v1";
 let AGENDA=null;
