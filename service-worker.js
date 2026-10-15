@@ -19,7 +19,7 @@
    se lembrar de subir o número do CACHE à mão. Agora: se há rede, vê-se sempre o
    mais recente; a cache é só a rede de segurança para quando não há rede. */
 
-const SHELL = 'buinho-welcome-shell-v11';
+const SHELL = 'buinho-welcome-shell-v12';
 const TILES = 'buinho-welcome-tiles-osm';  /* sem versão — ver acima. Mudou de nome em Out 2026
                                               para limpar as tiles CARTO com marca d'água «API key required». */
 
@@ -100,7 +100,7 @@ self.addEventListener('fetch', ev => {
   const ehShell = req.mode === 'navigate' || /\.(?:js|css)(?:\?|$)/.test(url.pathname);
   if (ehShell) {
     ev.respondWith(
-      fetch(req)
+      fetch(req, {cache: 'no-cache'})   /* revalida sempre: sem isto a cache HTTP do GitHub (10 min) servia o JS antigo */
         .then(r => guardar(SHELL, req, r))
         .catch(() => caches.match(req).then(c => c || caches.match('./index.html')))
     );
