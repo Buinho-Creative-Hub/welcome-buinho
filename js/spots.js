@@ -10,7 +10,7 @@
    COMO CORRIGIR UM PIN (5 segundos): abre o Google Maps ou o openstreetmap.org,
    clica com o botão direito no local exacto → copia os dois números
    (ex.: 37.8344, -8.2451), cola o primeiro em lat: e o segundo em lon:.
-   Os horários mudam-se no campo hours (substituir os [•••]).
+   Os horários mudam-se no campo hours.
 
    MODO DE EDIÇÃO DA EQUIPA (recomendado): edita os pontos no Google My Maps
    "Messejana for AIR", exporta KML, e corre tools/kml_to_spots.py para gerar
@@ -33,11 +33,11 @@ const SPOTS = [
   {id:"casadavo", addr:"Praça 1º de Julho, 7", cat:"buinho", lat:37.8349167, lon:-8.2451759, name:{en:"Casa d'Avó (residency house)",pt:"Casa d'Avó (casa de residência)"}, hours:{en:"—",pt:"—"}, note:{en:"Buinho residency accommodation.",pt:"Alojamento de residência do Buinho."}},
   {id:"saojoao", addr:"Rua Nova de Palma, 33", cat:"buinho", lat:37.8326427, lon:-8.2431600, name:{en:"São João house (residency)",pt:"Casa de São João (residência)"}, hours:{en:"—",pt:"—"}, note:{en:"Buinho residency accommodation.",pt:"Alojamento de residência do Buinho."}},
   {id:"buinhohouse", addr:"Rua Nova de São Brás, 43", cat:"buinho", lat:37.8310873, lon:-8.2454464, name:{en:"Buinho House (residency)",pt:"Buinho House (residência)"}, hours:{en:"—",pt:"—"}, note:{en:"Buinho residency accommodation.",pt:"Alojamento de residência do Buinho."}},
-  {id:"grocery1", cat:"shop", lat:37.8328831, lon:-8.2413800, name:{en:"Grocery store",pt:"Mercearia"}, hours:{en:"[•••]",pt:"[•••]"}, note:{en:"Everyday basics.",pt:"O essencial do dia-a-dia."}},
-  {id:"grocery2", cat:"shop", lat:37.8309405, lon:-8.2421102, name:{en:"Grocery store (south)",pt:"Mercearia (sul)"}, hours:{en:"[•••]",pt:"[•••]"}, note:{en:"Everyday basics.",pt:"O essencial do dia-a-dia."}},
+  {id:"grocery1", cat:"shop", lat:37.8328831, lon:-8.2413800, name:{en:"Grocery store",pt:"Mercearia"}, hours:{en:"Mon–Fri 9–13 & 15–19, Sat 9–13",pt:"2ª–6ª 9h–13h e 15h–19h, sáb 9h–13h"}, note:{en:"Everyday basics.",pt:"O essencial do dia-a-dia."}},
+  {id:"grocery2", cat:"shop", lat:37.8309405, lon:-8.2421102, name:{en:"Grocery store (south)",pt:"Mercearia (sul)"}, hours:{en:"Mon–Fri 9–13 & 15–19, Sat 9–13",pt:"2ª–6ª 9h–13h e 15h–19h, sáb 9h–13h"}, note:{en:"Everyday basics.",pt:"O essencial do dia-a-dia."}},
   {id:"bakery", cat:"shop", lat:37.8331534, lon:-8.2413857, name:{en:"Bakery",pt:"Padaria"}, hours:{en:"Daily, morning",pt:"Diário, de manhã"}, note:{en:"Fresh bread in the morning.",pt:"Pão fresco de manhã."}},
-  {id:"faustino", cat:"food", lat:37.8308646, lon:-8.2422207, name:{en:"Faustino (café / taberna)",pt:"Faustino (café / taberna)"}, hours:{en:"[•••]",pt:"[•••]"}, note:{en:"Local café — coffee and a bite.",pt:"Café local — um café e petisco."}},
-  {id:"pharmacy", cat:"health", lat:37.8341469, lon:-8.2442041, name:{en:"Pharmacy",pt:"Farmácia"}, hours:{en:"Mon–Fri [•••]",pt:"Seg–Sex [•••]"}, note:{en:"[•••]",pt:"[•••]"}},
+  {id:"faustino", cat:"food", lat:37.8308646, lon:-8.2422207, name:{en:"Faustino (café / taberna)",pt:"Faustino (café / taberna)"}, hours:{en:"Closed Sunday",pt:"Fecha ao domingo"}, note:{en:"Opposite the petrol station — coffee and one dish of the day.",pt:"Em frente à bomba de gasolina — café e um prato do dia."}},
+  {id:"pharmacy", cat:"health", lat:37.8341469, lon:-8.2442041, name:{en:"Pharmacy",pt:"Farmácia"}, hours:{en:"",pt:""}, note:{en:"The village pharmacy.",pt:"A farmácia da vila."}},
   {id:"atm", cat:"money", lat:37.8343710, lon:-8.2450260, name:{en:"ATM (Multibanco)",pt:"Multibanco"}, hours:{en:"24h",pt:"24h"}, note:{en:"Cash withdrawal.",pt:"Levantamento de dinheiro."}},
   {id:"pool", addr:"Rua do Município", cat:"nature", lat:37.8317236, lon:-8.2467606, name:{en:"Swimming pool",pt:"Piscina"}, hours:{en:"Summer",pt:"Verão"}, note:{en:"Municipal pool for hot days.",pt:"Piscina municipal para os dias quentes."}}
 ];

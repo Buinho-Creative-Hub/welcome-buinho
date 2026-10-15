@@ -240,7 +240,7 @@ function spotRow(s){
   const c=CATS[s.cat];
   const row=el("div","spot");row.dataset.id=s.id;
   row.innerHTML=`<span class="sq" style="background:${c.color}">${catGlyph(s.cat)}</span>
-    <div><div class="nm">${esc(t(s.name))}</div><div class="meta">${esc(t(c.label))} · ${esc(t(s.hours))} — ${esc(t(s.note))}</div></div>
+    <div><div class="nm">${esc(t(s.name))}</div><div class="meta">${[t(c.label),t(s.hours),t(s.note)].filter(x=>x&&x!=="—").map(esc).join(" · ")}</div></div>
     <a class="go" href="${goUrl(s)}" target="_blank" rel="noopener">${LANG()==="pt"?"Ir":"Go"} →</a>`;
   row.onclick=e=>{if(e.target.closest('.go'))return;openMap(s.id);};
   return row;
@@ -261,9 +261,6 @@ function renderMap(){
   v.appendChild(cats);
   const listWrap=el("div");listWrap.id="spotlist";v.appendChild(listWrap);
   refreshList();
-  v.appendChild(el("div","editnote",(LANG()==="pt"
-    ?"<b>Editável:</b> a equipa muda estes pontos (nome, categoria, horário, coordenadas) num só sítio — o ficheiro <b>spots</b>, importado do Google My Maps do Buinho — sem programar. Editor visual dentro da app fica para a fase com backend."
-    :"<b>Editable:</b> the team edits these points (name, category, hours, coordinates) in one place — the <b>spots</b> file, imported from Buinho's Google My Maps — no coding. In-app visual editor comes with the backend phase.")));
   initLeaflet();
 }
 function refreshList(){
