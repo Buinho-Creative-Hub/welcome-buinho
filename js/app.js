@@ -2,7 +2,7 @@
    app.js — welcome-buinho (lógica: i18n, frieze de azulejo, vistas, mapa, router)
    ----------------------------------------------------------------------------
    Depende de: content.js (objecto C) e spots.js (CATS + SPOTS), carregados antes.
-   Mapa: Leaflet + tiles CARTO Positron (carregados do CDN no index.html).
+   Mapa: Leaflet + tiles OpenStreetMap em tons de cinza (o CARTO passou a exigir chave, Out 2026).
 
    ⚠️ NOTA (não repetir o bug): o helper de idioma chama-se LANG(), NUNCA L —
    "L" é o namespace global do Leaflet; chamar-lhe L partiria o mapa
@@ -192,7 +192,8 @@ function drawMarkers(){
 const MESSEJANA = [37.83278, -8.24278];
 
 /* Camada de tiles com dupla origem: primeiro a cópia local (./tiles/), e só se
-   essa faltar é que tenta o CARTO. Offline e fora da área descarregada, o
+   essa faltar é que tenta o OpenStreetMap (o CARTO passou a exigir chave
+   de API em Out 2026 e devolvia tiles com marca d'água). Offline e fora da área descarregada, o
    service worker devolve uma tile cinzenta em vez de um quadrado preto.
    As tiles locais geram-se com tools/baixar-tiles.py — ver README. */
 const TileComFallback = L.TileLayer.extend({
@@ -200,7 +201,7 @@ const TileComFallback = L.TileLayer.extend({
     const img = document.createElement('img');
     img.alt = '';
     const local  = './tiles/' + coords.z + '/' + coords.x + '/' + coords.y + '.png';
-    const remoto = 'https://a.basemaps.cartocdn.com/light_all/' +
+    const remoto = 'https://tile.openstreetmap.org/' +
                    coords.z + '/' + coords.x + '/' + coords.y + '.png';
     let caiuParaRemoto = false;
     img.onload  = () => done(null, img);
@@ -217,7 +218,7 @@ function initLeaflet(){
   if(!window.L){document.getElementById("leaflet").innerHTML='<div style="padding:20px;color:#5a5a5a;font-size:14px">Mapa indisponível.</div>';return;}
   LMAP=L.map("leaflet",{zoomControl:true,attributionControl:false,scrollWheelZoom:false}).setView(MESSEJANA,16);
   new TileComFallback('', {maxZoom:19, minZoom:13}).addTo(LMAP);
-  L.control.attribution({prefix:false}).addAttribution('© OpenStreetMap · © CARTO').addTo(LMAP);
+  L.control.attribution({prefix:false}).addAttribution('© OpenStreetMap contributors').addTo(LMAP);
   drawMarkers();
   const pts=SPOTS.filter(s=>!mapFilter||s.cat===mapFilter).map(s=>[s.lat,s.lon]);
   if(pts.length>1){try{LMAP.fitBounds(pts,{padding:[38,38],maxZoom:16});}catch(e){}}

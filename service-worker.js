@@ -19,8 +19,9 @@
    se lembrar de subir o número do CACHE à mão. Agora: se há rede, vê-se sempre o
    mais recente; a cache é só a rede de segurança para quando não há rede. */
 
-const SHELL = 'buinho-welcome-shell-v10';
-const TILES = 'buinho-welcome-tiles';      /* sem versão — ver acima */
+const SHELL = 'buinho-welcome-shell-v11';
+const TILES = 'buinho-welcome-tiles-osm';  /* sem versão — ver acima. Mudou de nome em Out 2026
+                                              para limpar as tiles CARTO com marca d'água «API key required». */
 
 const ESTATICOS = [
   './', './index.html',
@@ -77,11 +78,11 @@ self.addEventListener('fetch', ev => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
 
-  /* Tiles do mapa (locais ou, em último recurso, do CARTO): cache primeiro e
+  /* Tiles do mapa (locais ou, em último recurso, do OpenStreetMap): cache primeiro e
      para sempre. O mapa de uma vila de 800 habitantes não muda de semana para
      semana, e cada tile poupada é dados móveis que o artista não gasta. */
   const ehTile = /\/tiles\/.*\.png$/.test(url.pathname) ||
-                 /basemaps\.cartocdn\.com/.test(url.hostname);
+                 /tile\.openstreetmap\.org/.test(url.hostname);
   if (ehTile) {
     ev.respondWith(
       caches.match(req).then(hit => hit ||

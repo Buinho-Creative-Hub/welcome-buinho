@@ -121,6 +121,8 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--blue);border-col
 .mapwrap{position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line-2);
   background:var(--cream);height:330px;margin:4px 0 14px}
 #leaflet{position:absolute;inset:0;width:100%;height:100%;background:var(--cream)}
+/* OSM em tons de cinza claros, para manter o ar sóbrio do antigo CARTO Positron; os pins ficam a cores */
+#leaflet .leaflet-tile-pane{filter:grayscale(1) brightness(1.06) contrast(.92)}
 .leaflet-container{font-family:'Asap',sans-serif;background:#eef0ea}
 /* custom marker (rounded colour tile + meaningful white glyph) */
 .mk-tile{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;
