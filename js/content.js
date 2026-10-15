@@ -28,7 +28,7 @@ const C = {
       {t:{en:"Where to arrive",pt:"Onde chegar"},b:{en:"Head to the Espaço Comunitário — Praça 1º de Julho, 11, 7600-318 Messejana. That's where the team is; they'll meet you and take you to your house.",pt:"Vem ter ao Espaço Comunitário — Praça 1º de Julho, 11, 7600-318 Messejana. É onde a equipa está; recebem-te e levam-te à tua casa."}},
       {t:{en:"From Lisbon",pt:"Desde Lisboa"},b:{en:"Train or Rede Expressos coach to Aljustrel / Ferreira (~2h30), then a short taxi or a pickup we arrange. Tell us your arrival time.",pt:"Comboio ou Rede Expressos até Aljustrel / Ferreira (~2h30), depois táxi curto ou boleia combinada. Diz-nos a hora de chegada."}},
       {t:{en:"From Faro airport",pt:"Do aeroporto de Faro"},b:{en:"~1h15 by car. Coach via Ourique. Coordinate in advance.",pt:"~1h15 de carro. Autocarro via Ourique. Combina com antecedência."}},
-      {t:{en:"On arrival",pt:"À chegada"},b:{en:"Do the Check-in in this app and message your host. Someone meets you with the keys.",pt:"Faz o Check-in nesta app e avisa o anfitrião. Alguém te recebe com as chaves."}}
+      {t:{en:"On arrival",pt:"À chegada"},b:{en:"Tap «Team» → «I've arrived» in this app. Someone meets you with the keys.",pt:"Toca em «Team» → «Cheguei» nesta app. Alguém te recebe com as chaves."}}
     ],mapLabel:{en:"See on the map",pt:"Ver no mapa"}},
   house:{intro:{en:"The residency home is shared. A few simple habits keep it good for everyone.",pt:"A casa de residência é partilhada. Alguns hábitos simples mantêm-na boa para todos."},
     wifi:{net:"Buinho (Starlink)",pass:"buinho15",note:{en:"Several Starlink networks across the village — same password everywhere.",pt:"Várias redes Starlink pela aldeia — a mesma password em todas."}},
