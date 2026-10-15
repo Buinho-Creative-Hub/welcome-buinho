@@ -93,6 +93,7 @@ const DETAIL={
     const linhas=guiaVisivel();
     if(linhas.length){
       const ordem=[];linhas.forEach(g=>{if(!ordem.includes(g.secao))ordem.push(g.secao);});
+      if(ordem.includes("Messejana"))ordem.push(ordem.splice(ordem.indexOf("Messejana"),1)[0]); /* Messejana por último, junto ao mapa */
       ordem.forEach(sec=>{const bl=el("div","block");bl.appendChild(el("h3",null,esc(SEC_NOME[sec]?t(SEC_NOME[sec]):sec)));
         linhas.filter(g=>g.secao===sec).forEach(g=>{const det=el("details","faq");
           const q=pt?g.pergunta:(g.pergunta_en||g.pergunta),r=pt?(g.pt||g.en):(g.en||g.pt);
@@ -207,9 +208,7 @@ const DETAIL={
 /* Messejana e arredores — subsecção do Guia */
 function arredores(){const pt=LANG()==="pt",w=el("div");
   w.insertAdjacentHTML("beforeend",frieze("#159a6b"));
-  w.appendChild(el("h2","h2",esc(pt?"Messejana e arredores":"Messejana & around")));
   w.appendChild(el("p","lead",esc(t(C.local.intro))));
-  if(C.local.blocks)C.local.blocks.forEach(bk=>w.appendChild(block(bk.t,`<p>${esc(t(bk.b))}</p>`)));
   const ob=el("button","btn","🗺 "+(pt?"Abrir o mapa de Messejana":"Open the Messejana map"));ob.onclick=()=>go("map");w.appendChild(ob);
   const ul=el("div");ul.style.marginTop="8px";SPOTS.filter(s=>s.id!=="fablab").forEach(s=>ul.appendChild(spotRow(s)));w.appendChild(ul);return w;}
 /* Reserva de máquina — no fim da secção FabLab */
@@ -446,9 +445,9 @@ const GUIA_CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vTuIC8nLTMgr
 const GUIA_ASK_URL="https://buinho.app.n8n.cloud/webhook/welcome-air-ask";
 const GUIA_KEY="buinho-guia-v1";
 const SEC_NOME={Chegada:{en:"Arriving",pt:"Chegada"},Casa:{en:"The house",pt:"A casa"},Buinho:{en:"Buinho & FabLab",pt:"Buinho e FabLab"},
-  Messejana:{en:"Messejana",pt:"Messejana"},Ajuda:{en:"Help",pt:"Ajuda"},"Saída":{en:"Leaving",pt:"Saída"}};
+  Messejana:{en:"Messejana & around",pt:"Messejana e arredores"},Ajuda:{en:"Help",pt:"Ajuda"},"Saída":{en:"Leaving",pt:"Saída"}};
 /* perguntas em EN (a coluna do Sheet tem só a pergunta em PT) */
-const PERG_EN={"Onde é o ponto de chegada?":"Where do I arrive?","Como chego desde Lisboa?":"How do I get here from Lisbon?",
+const PERG_EN={"Que carrinhas passam na vila (pão, fruta, peixe)?":"Which vans come through the village (bread, fruit, fish)?","Onde é o ponto de chegada?":"Where do I arrive?","Como chego desde Lisboa?":"How do I get here from Lisbon?",
   "Como chego desde o aeroporto de Faro?":"How do I get here from Faro airport?","E se chegar fora de horas?":"What if I arrive late?",
   "Qual é o Wi-Fi?":"What's the Wi-Fi?","Regras da casa":"House rules","Há roupa de cama e toalhas?":"Are bed linen and towels provided?",
   "Onde lavo e seco a roupa?":"Where can I do laundry?","Como funciona a água quente?":"How does the hot water work?",
