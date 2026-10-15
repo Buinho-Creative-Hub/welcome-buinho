@@ -138,12 +138,17 @@ const DETAIL={
 
 /* ================= MAP ================= */
 let mapFilter=null, mapSel=null;
+/* «Ir»: abre o Google Maps no sítio certo — morada se houver, senão as coordenadas do pin. */
+function goUrl(s){
+  const q = s.addr ? s.addr + ', 7600 Messejana, Portugal' : s.lat + ',' + s.lon;
+  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+}
 function spotRow(s){
   const c=CATS[s.cat];
   const row=el("div","spot");row.dataset.id=s.id;
   row.innerHTML=`<span class="sq" style="background:${c.color}">${catGlyph(s.cat)}</span>
     <div><div class="nm">${esc(t(s.name))}</div><div class="meta">${esc(t(c.label))} · ${esc(t(s.hours))} — ${esc(t(s.note))}</div></div>
-    <a class="go" href="https://maps.google.com/?q=Messejana,Aljustrel" target="_blank" rel="noopener">${LANG()==="pt"?"Ir":"Go"} →</a>`;
+    <a class="go" href="${goUrl(s)}" target="_blank" rel="noopener">${LANG()==="pt"?"Ir":"Go"} →</a>`;
   row.onclick=e=>{if(e.target.closest('.go'))return;openMap(s.id);};
   return row;
 }
