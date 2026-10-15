@@ -32,6 +32,7 @@ const ICONS={
   euro:'<path d="M16.5 6.8A6 6 0 1 0 16.5 17"/><path d="M4.5 10.5h8M4.5 13.5h7"/>',
   tree:'<path d="M12 3 6.5 12h11L12 3Z"/><path d="M12 8.5 8 15h8l-4-6.5Z"/><path d="M12 15v5"/>',
   house:'<path d="M4 11 12 4l8 7"/><path d="M6 10v10h12V10"/><path d="M10 20v-5h4v5"/>',
+  landmark:'<path d="M4 9 12 4l8 5"/><path d="M5 20h14"/><path d="M7 10v8M12 10v8M17 10v8"/>',
   star:'<path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"/>'
 };
 function catGlyph(cat){
@@ -315,9 +316,9 @@ function initLeaflet(){
   new TileComFallback('', {maxZoom:19, minZoom:13}).addTo(LMAP);
   L.control.attribution({prefix:false}).addAttribution('© OpenStreetMap contributors').addTo(LMAP);
   drawMarkers();
-  const pts=SPOTS.filter(s=>!mapFilter||s.cat===mapFilter).map(s=>[s.lat,s.lon]);
-  if(pts.length>1){try{LMAP.fitBounds(pts,{padding:[38,38],maxZoom:16});}catch(e){}}
-  setTimeout(()=>LMAP&&LMAP.invalidateSize(),200);
+  const pts=SPOTS.filter(s=>(!mapFilter||s.cat===mapFilter)&&(mapFilter||!s.far)).map(s=>[s.lat,s.lon]);
+  const ajusta=()=>{if(!LMAP)return;LMAP.invalidateSize();if(pts.length>1){try{LMAP.fitBounds(pts,{padding:[30,30],maxZoom:16});}catch(e){}}};
+  ajusta();setTimeout(ajusta,200);
 }
 let USERMARK=null, USERRING=null;
 function locateMe(btn){
