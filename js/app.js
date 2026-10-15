@@ -53,7 +53,7 @@ function renderHome(){
   ess.innerHTML=`<svg class="ess-tile" viewBox="0 0 48 48"><use href="#az-quatre" fill="#1a1a1a"/></svg>
     <div class="lbl">${LANG()==="pt"?"ESSENCIAL":"ESSENTIALS"}</div>
     <div class="row"><span class="k">Wi-Fi</span><span class="v">${esc(C.house.wifi.net)} · ${esc(C.house.wifi.pass)}</span></div>
-    <div class="row"><span class="k">${LANG()==="pt"?"Morada":"Address"}</span><span class="v"><a href="#" data-map="fablab">Rua [•••], Messejana</a></span></div>
+    <div class="row"><span class="k">${LANG()==="pt"?"Morada":"Address"}</span><span class="v"><a href="#" data-map="fablab">Praça 1º de Julho, 11, Messejana</a></span></div>
     <div class="row"><span class="k">${LANG()==="pt"?"Emergência":"Emergency"}</span><span class="v red">112 →</span></div>`;
   ess.querySelector('[data-map]').onclick=e=>{e.preventDefault();openMap("fablab");};
   ess.querySelectorAll('.row')[2].onclick=()=>go("contacts");
@@ -73,23 +73,23 @@ function renderHome(){
 
 /* ================= DETAIL ================= */
 function head(title,lead){const w=el("div");w.appendChild(el("h2","h2",esc(t(title))));if(lead)w.appendChild(el("p","lead",esc(t(lead))));return w;}
-function secTitle(id){return C.sections.find(s=>s.id===id).title;}
+const EXTRA_TIT={ask:{en:"Assistant",pt:"Assistente"}};
+function secTitle(id){const s=C.sections.find(s=>s.id===id);return s?s.title:EXTRA_TIT[id];}
 function block(title,html){const b=el("div","block");if(title)b.appendChild(el("h3",null,esc(t(title))));if(html)b.insertAdjacentHTML("beforeend",html);return b;}
 
 const DETAIL={
-  arrival(){const d=C.arrival,v=el("div");v.appendChild(head(secTitle("arrival"),d.intro));
+  arrival(){const d=C.arrival,v=el("div"),pt=LANG()==="pt";v.appendChild(head(secTitle("arrival"),d.intro));
+    const w=C.contacts.whatsapp;
+    if(w){const wa=el("div","block");wa.appendChild(el("h3",null,esc(t(w.label))));
+      if(w.note)wa.appendChild(el("p",null,esc(t(w.note))));
+      const wb=el("a","btn",esc(t(w.cta))+" →");wb.href=w.url;wb.target="_blank";wb.rel="noopener";wa.appendChild(wb);v.appendChild(wa);}
     d.blocks.forEach(bk=>v.appendChild(block(bk.t,`<p>${esc(t(bk.b))}</p>`)));
+    const ch=el("button","btn",(pt?"Já cheguei — avisar a equipa":"I've arrived — tell the team")+" →");ch.onclick=()=>go("checkin");v.appendChild(ch);
     const a=el("button","btn ghost",t(d.mapLabel)+" →");a.onclick=()=>openMap("fablab");v.appendChild(a);return v;},
   house(){const d=C.house,v=el("div");const pt=LANG()==="pt";
     v.appendChild(head(secTitle("house"),{en:"Practical answers about the house, Buinho and Messejana.",pt:"Respostas práticas sobre a casa, o Buinho e Messejana."}));
-    /* Perguntar ao guia (Haiku via n8n, só responde com o guia) */
-    const ask=el("div","ask");ask.innerHTML=`<label class="f">${pt?"Pergunta ao guia":"Ask the guide"}</label>
-      <div class="ask-row"><input id="ask-q" maxlength="300" placeholder="${pt?"Ex.: onde compro pão?":"E.g. where can I buy bread?"}"><button class="btn" id="ask-b">${pt?"Perguntar":"Ask"}</button></div>
-      <div class="ask-a" id="ask-a"></div>`;v.appendChild(ask);
-    const qi=ask.querySelector("#ask-q"),ab=ask.querySelector("#ask-b"),aa=ask.querySelector("#ask-a");
-    const perguntar=()=>{const q=qi.value.trim();if(q.length<3)return;ab.disabled=true;aa.className="ask-a show";aa.textContent=pt?"A pensar…":"Thinking…";
-      perguntarGuia(q).then(r=>{aa.textContent=r;}).finally(()=>{ab.disabled=false;});};
-    ab.onclick=perguntar;qi.onkeydown=e=>{if(e.key==="Enter")perguntar();};
+    const ak=el("div","ask ask-link");ak.innerHTML=`<span>${pt?"Não encontras? Pergunta ao assistente.":"Can't find it? Ask the assistant."}</span><span class="arr">›</span>`;
+    ak.onclick=()=>go("ask");v.appendChild(ak);
     const linhas=guiaVisivel();
     if(linhas.length){
       const ordem=[];linhas.forEach(g=>{if(!ordem.includes(g.secao))ordem.push(g.secao);});
@@ -98,16 +98,20 @@ const DETAIL={
           const q=pt?g.pergunta:(g.pergunta_en||g.pergunta),r=pt?(g.pt||g.en):(g.en||g.pt);
           det.innerHTML=`<summary>${esc(q)}${g.casa&&g.casa!=="todas"?` <span class="todo">${esc(g.casa)}</span>`:""}</summary><p>${esc(r)}</p>`;bl.appendChild(det);});
         v.appendChild(bl);});
-      return v;}
+      v.appendChild(arredores());return v;}
     /* sem guia (offline e sem cópia): conteúdo de base */
     v.appendChild(block({en:"Wi-Fi",pt:"Wi-Fi"},`<div class="kv"><span class="k">SSID</span><span class="v">${esc(d.wifi.net)}</span></div><div class="kv"><span class="k">Password</span><span class="v">${esc(d.wifi.pass)}</span></div>`));
     const r=el("div","block");r.appendChild(el("h3",null,pt?"Regras da casa":"House rules"));
-    const ul=el("ul","rules");t(d.rules).forEach(x=>ul.appendChild(el("li",null,esc(x))));r.appendChild(ul);v.appendChild(r);return v;},
-  fablab(){const d=C.fablab,v=el("div");v.appendChild(head(secTitle("fablab"),d.intro));
-    d.machines.forEach(m=>{const tag=m.book?`<span class="mtag">${LANG()==="pt"?"reserva":"booking"}</span>`:"";
-      const b=block(null,`<h3>${esc(t(m.name))}${tag}</h3><p>${esc(t(m.notes))}</p>`);
-      if(m.book){const rb=el("button","btn ghost",(LANG()==="pt"?"Reservar":"Reserve")+" →");rb.onclick=()=>{go("reserve");setTimeout(()=>{const s=document.getElementById("res-m");if(s)s.value=m.id;},50);};b.appendChild(rb);}
-      v.appendChild(b);});return v;},
+    const ul=el("ul","rules");t(d.rules).forEach(x=>ul.appendChild(el("li",null,esc(x))));r.appendChild(ul);v.appendChild(r);v.appendChild(arredores());return v;},
+  fablab(){const d=C.fablab,v=el("div"),pt=LANG()==="pt";v.appendChild(head(secTitle("fablab"),d.intro));
+    if(d.rules){const r=el("div","block");r.appendChild(el("h3",null,pt?"Como funciona":"How it works"));
+      const ul=el("ul","rules");t(d.rules).forEach(x=>ul.appendChild(el("li",null,esc(x))));r.appendChild(ul);v.appendChild(r);}
+    d.machines.forEach(m=>{const tag=m.book?`<span class="mtag">${pt?"reserva":"booking"}</span>`:"";
+      const b=block(null,`<h3>${esc(t(m.name))}${tag}</h3>${m.spec?`<p>${esc(t(m.spec))}</p>`:""}${m.notes?`<p class="note">${esc(t(m.notes))}</p>`:""}`);
+      if(m.book){const rb=el("button","btn ghost",(pt?"Reservar":"Book")+" ↓");rb.onclick=()=>{const s=document.getElementById("res-m");if(s)s.value=m.id;document.getElementById("reservar")?.scrollIntoView({behavior:"smooth"});};b.appendChild(rb);}
+      else b.insertAdjacentHTML("beforeend",`<p class="note">${pt?"Sem reserva — fala com a equipa no FabLab.":"No booking needed — ask the team at the FabLab."}</p>`);
+      v.appendChild(b);});
+    v.appendChild(formReserva());return v;},
   schedule(){const d=C.schedule,v=el("div");
     const ag=agendaProxima();
     if(ag.length){
@@ -140,12 +144,6 @@ const DETAIL={
     const ppl=el("div","block");ppl.style.marginTop="16px";ppl.appendChild(el("h3",null,d.peopleLabel?t(d.peopleLabel):(LANG()==="pt"?"Equipa":"Team")));
     d.people.forEach(p=>{const row=el("div","kv");row.innerHTML=`<span class="k">${esc(t(p.r))} · ${esc(p.nm)}</span><a class="v" href="tel:${esc(p.ph)}">${esc(p.ph)}</a>`;ppl.appendChild(row);});v.appendChild(ppl);
     return v;},
-  local(){const v=el("div");v.appendChild(head(secTitle("local"),C.local.intro));
-    if(C.local.blocks)C.local.blocks.forEach(bk=>v.appendChild(block(bk.t,`<p>${esc(t(bk.b))}</p>`)));
-    v.insertAdjacentHTML("beforeend",frieze("#159a6b"));
-    const openBtn=el("button","btn","🗺 "+(LANG()==="pt"?"Abrir o mapa de Messejana":"Open the Messejana map"));openBtn.onclick=()=>go("map");v.appendChild(openBtn);
-    const ul=el("div");ul.style.marginTop="8px";
-    SPOTS.filter(s=>s.id!=="fablab").forEach(s=>ul.appendChild(spotRow(s)));v.appendChild(ul);return v;},
   checkin(){const v=el("div");const pt=LANG()==="pt";
     v.appendChild(head(secTitle("checkin"),{en:"Arrived, something wrong in the house, a question, or feedback — tell us here. It goes straight to the team.",pt:"Chegaste, há um problema na casa, uma dúvida ou feedback — diz-nos aqui. Vai direto para a equipa."}));
     const tipos=[["arrived",{en:"I've arrived",pt:"Cheguei"}],["problem",{en:"Problem in the house",pt:"Problema na casa"}],["question",{en:"Question",pt:"Dúvida"}],["feedback",{en:"Feedback",pt:"Feedback"}]];
@@ -189,23 +187,48 @@ const DETAIL={
       guardarQuemSou(nome,casa);btn.disabled=true;
       enviarEquipa(Object.assign({tipo,nome,casa,mensagem:msg,nota:"",hp:val("eq-hp")},extra),done,()=>{btn.disabled=false;["eq-msg","eq-bem","eq-mudar"].forEach(i=>{const x=f.querySelector("#"+i);if(x)x.value="";});});};
     v.appendChild(btn);v.appendChild(done);
-    v.appendChild(el("p","ag-stamp",esc(pt?"Urgência ou perigo? Usa o SOS (112).":"Emergency or danger? Use SOS (112).")));
-    return v;},
-  reserve(){const v=el("div");const pt=LANG()==="pt";v.appendChild(head(secTitle("reserve"),{en:"Pick a machine and a slot. The team confirms.",pt:"Escolhe máquina e horário. A equipa confirma."}));
-    const opts=C.fablab.machines.filter(m=>m.book).map(m=>`<option value="${m.id}">${esc(t(m.name))}</option>`).join("");
-    const f=el("div");f.innerHTML=`<label class="f">${pt?"Máquina":"Machine"}</label><select id="res-m">${opts}</select>
-      <label class="f">${pt?"Nome":"Name"}</label><input id="res-name">
-      <div class="two"><div><label class="f">${pt?"Dia":"Day"}</label><input id="res-date" type="date"></div>
-      <div><label class="f">${pt?"Hora":"Time"}</label><input id="res-time" type="time"></div></div>
-      <label class="f">${pt?"Notas (opcional)":"Notes (optional)"}</label><textarea id="res-notes" rows="2"></textarea>`;v.appendChild(f);
-    f.querySelector("#res-name").value=quemSou().nome||"";
-    const btn=el("button","btn","📌 "+(pt?"Pedir reserva":"Request booking"));const done=el("div","done");
-    btn.onclick=()=>{const mN=document.querySelector('#res-m option:checked').textContent,nome=val("res-name").trim();
-      if(!nome||!val("res-date")){done.classList.add("show");done.textContent=pt?"Falta o nome ou o dia.":"Name and day, please.";return;}
-      guardarQuemSou(nome,quemSou().casa||"");btn.disabled=true;
-      enviarEquipa({tipo:"booking",nome,casa:quemSou().casa||"",mensagem:`${mN} · ${val("res-date")} ${val("res-time")}${val("res-notes")?" · "+val("res-notes"):""}`,nota:"",hp:""},done,()=>{btn.disabled=false;});};
-    v.appendChild(btn);v.appendChild(done);return v;}
+    v.appendChild(el("p","ag-stamp",esc(pt?"Urgência ou perigo? Liga 112 (ver Contactos e segurança).":"Emergency or danger? Call 112 (see Contacts & safety).")));
+    return v;}
+,
+  ask(){const v=el("div"),pt=LANG()==="pt";
+    v.appendChild(head(secTitle("ask"),{en:"Ask anything practical about the house, Buinho, the FabLab or Messejana — in any language.",pt:"Pergunta qualquer coisa prática sobre a casa, o Buinho, o FabLab ou Messejana — em qualquer língua."}));
+    const log=el("div","chat");v.appendChild(log);
+    const box=el("div","ask");box.innerHTML=`<div class="ask-row"><input id="ask-q" maxlength="300" placeholder="${pt?"Ex.: onde compro pão?":"E.g. where can I buy bread?"}"><button class="btn" id="ask-b">${pt?"Perguntar":"Ask"}</button></div>`;v.appendChild(box);
+    const team=el("button","btn ghost",(pt?"Falar com a equipa":"Talk to the team")+" →");team.style.display="none";team.onclick=()=>go("checkin");v.appendChild(team);
+    const qi=box.querySelector("#ask-q"),ab=box.querySelector("#ask-b");
+    const perguntar=()=>{const q=qi.value.trim();if(q.length<3)return;ab.disabled=true;qi.value="";
+      log.appendChild(el("div","msg me",esc(q)));const a=el("div","msg bot",pt?"A pensar…":"Thinking…");log.appendChild(a);a.scrollIntoView({block:"nearest"});
+      perguntarGuia(q).then(r=>{a.textContent=r;team.style.display="";}).finally(()=>{ab.disabled=false;qi.focus();});};
+    ab.onclick=perguntar;qi.onkeydown=e=>{if(e.key==="Enter")perguntar();};
+    v.appendChild(el("p","ag-stamp",esc(pt?"O assistente responde a partir do guia do Buinho. Se não souber, diz-te para falares com a equipa.":"The assistant answers from Buinho's guide. If it can't help, it will point you to the team.")));
+    return v;}
 };
+
+/* Messejana e arredores — subsecção do Guia */
+function arredores(){const pt=LANG()==="pt",w=el("div");
+  w.insertAdjacentHTML("beforeend",frieze("#159a6b"));
+  w.appendChild(el("h2","h2",esc(pt?"Messejana e arredores":"Messejana & around")));
+  w.appendChild(el("p","lead",esc(t(C.local.intro))));
+  if(C.local.blocks)C.local.blocks.forEach(bk=>w.appendChild(block(bk.t,`<p>${esc(t(bk.b))}</p>`)));
+  const ob=el("button","btn","🗺 "+(pt?"Abrir o mapa de Messejana":"Open the Messejana map"));ob.onclick=()=>go("map");w.appendChild(ob);
+  const ul=el("div");ul.style.marginTop="8px";SPOTS.filter(s=>s.id!=="fablab").forEach(s=>ul.appendChild(spotRow(s)));w.appendChild(ul);return w;}
+/* Reserva de máquina — no fim da secção FabLab */
+function formReserva(){const pt=LANG()==="pt",v=el("div","block");v.id="reservar";
+  v.appendChild(el("h3",null,pt?"Pedir reserva":"Request a booking"));
+  v.appendChild(el("p","note",esc(pt?"Escolhe máquina e horário. A equipa confirma.":"Pick a machine and a slot. The team confirms.")));
+  const opts=C.fablab.machines.filter(m=>m.book).map(m=>`<option value="${m.id}">${esc(t(m.name))}</option>`).join("");
+  const f=el("div");f.innerHTML=`<label class="f">${pt?"Máquina":"Machine"}</label><select id="res-m">${opts}</select>
+    <label class="f">${pt?"Nome":"Name"}</label><input id="res-name">
+    <div class="two"><div><label class="f">${pt?"Dia":"Day"}</label><input id="res-date" type="date"></div>
+    <div><label class="f">${pt?"Hora":"Time"}</label><input id="res-time" type="time"></div></div>
+    <label class="f">${pt?"Notas (opcional)":"Notes (optional)"}</label><textarea id="res-notes" rows="2"></textarea>`;v.appendChild(f);
+  f.querySelector("#res-name").value=quemSou().nome||"";
+  const btn=el("button","btn","📌 "+(pt?"Pedir reserva":"Request booking"));const done=el("div","done");
+  btn.onclick=()=>{const mN=f.querySelector('#res-m option:checked').textContent,nome=val("res-name").trim();
+    if(!nome||!val("res-date")){done.classList.add("show");done.textContent=pt?"Falta o nome ou o dia.":"Name and day, please.";return;}
+    guardarQuemSou(nome,quemSou().casa||"");btn.disabled=true;
+    enviarEquipa({tipo:"booking",nome,casa:quemSou().casa||"",mensagem:`${mN} · ${val("res-date")} ${val("res-time")}${val("res-notes")?" · "+val("res-notes"):""}`,nota:"",hp:""},done,()=>{btn.disabled=false;});};
+  v.appendChild(btn);v.appendChild(done);return v;}
 
 /* ================= MAP ================= */
 let mapFilter=null, mapSel=null;
@@ -453,18 +476,18 @@ function actualizarGuia(){
 }
 function idDispositivo(){try{let d=localStorage.getItem("buinho-dev");if(!d){d=(crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2));localStorage.setItem("buinho-dev",d);}return d;}catch(e){return "anon";}}
 function perguntarGuia(q){const pt=LANG()==="pt";
-  const falha=pt?"Não consegui responder agora. Usa o botão «Team» e a equipa responde-te.":"I couldn't answer right now. Use the «Team» button and the team will reply.";
+  const falha=pt?"Não consegui responder agora. Vai a «Falar com a equipa» e a equipa responde-te.":"I couldn't answer right now. Go to «Talk to the team» and the team will reply.";
   return fetch(GUIA_ASK_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=UTF-8"},body:JSON.stringify({q,dev:idDispositivo(),lang:LANG()})})
     .then(r=>r.ok?r.json():null).then(j=>{
       if(j&&j.answer)return j.answer;
-      if(j&&(j.motivo==="limite_dev"||j.motivo==="limite_dia"))return pt?"Por hoje o guia já respondeu a muitas perguntas. Usa o botão «Team» para falar com a equipa.":"The guide has answered a lot of questions today. Use the «Team» button to reach the team.";
+      if(j&&(j.motivo==="limite_dev"||j.motivo==="limite_dia"))return pt?"Por hoje o guia já respondeu a muitas perguntas. Vai a «Falar com a equipa».":"The guide has answered a lot of questions today. Go to «Talk to the team».";
       return falha;}).catch(()=>falha);
 }
 
 /* ================= router ================= */
 function go(id){location.hash=id?("#"+id):"#home";}
 function route(){
-  const id=(location.hash||"#home").slice(1);
+  let id=(location.hash||"#home").slice(1);if(id==="reserve")id="fablab";if(id==="local")id="house";
   const home=document.getElementById("v-home"),det=document.getElementById("v-detail"),map=document.getElementById("v-map"),back=document.getElementById("backbtn");
   [home,det,map].forEach(x=>x.classList.remove("active"));
   const brand=document.getElementById("brand");

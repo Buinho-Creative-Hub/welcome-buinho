@@ -182,3 +182,9 @@ details.faq summary::-webkit-details-marker{display:none}
 details.faq summary::after{content:"+";float:right;color:var(--muted)}
 details.faq[open] summary::after{content:"–"}
 details.faq p{margin:8px 0 2px;color:#333}
+/* assistente */
+.ask-link{display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-weight:600}
+.chat{display:flex;flex-direction:column;gap:8px;margin:8px 0 12px}
+.chat .msg{padding:10px 12px;border-radius:12px;max-width:88%;white-space:pre-wrap;line-height:1.45}
+.chat .me{align-self:flex-end;background:#2364ff;color:#fff}
+.chat .bot{align-self:flex-start;background:#fff;border:1px solid rgba(0,0,0,.08)}
