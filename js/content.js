@@ -20,7 +20,7 @@ const C = {
     {id:"schedule",n:"04",title:{en:"Your week",pt:"A tua semana"}},
     {id:"contacts",n:"05",title:{en:"Contacts & safety",pt:"Contactos e segurança"}},
     {id:"local",n:"06",title:{en:"Messejana & around",pt:"Messejana e arredores"}},
-    {id:"checkin",n:"07",title:{en:"Check-in",pt:"Check-in"},todo:{en:"to do",pt:"a fazer"}},
+    {id:"checkin",n:"07",title:{en:"Talk to the team",pt:"Falar com a equipa"}},
     {id:"reserve",n:"08",title:{en:"Reserve a machine",pt:"Reservar máquina"}}
   ],
   arrival:{intro:{en:"Buinho FabLab is in Messejana, a village of ~800 in the Alentejo (Aljustrel), southern Portugal.",pt:"O Buinho FabLab fica em Messejana, aldeia de ~800 pessoas no Alentejo (Aljustrel), sul de Portugal."},

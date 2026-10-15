@@ -127,32 +127,50 @@ const DETAIL={
     const openBtn=el("button","btn","🗺 "+(LANG()==="pt"?"Abrir o mapa de Messejana":"Open the Messejana map"));openBtn.onclick=()=>go("map");v.appendChild(openBtn);
     const ul=el("div");ul.style.marginTop="8px";
     SPOTS.filter(s=>s.id!=="fablab").forEach(s=>ul.appendChild(spotRow(s)));v.appendChild(ul);return v;},
-  checkin(){const v=el("div");v.appendChild(head(secTitle("checkin"),{en:"Let us know you've arrived safely.",pt:"Avisa-nos que chegaste em segurança."}));
+  checkin(){const v=el("div");const pt=LANG()==="pt";
+    v.appendChild(head(secTitle("checkin"),{en:"Arrived, something wrong in the house, a question, or feedback — tell us here. It goes straight to the team.",pt:"Chegaste, há um problema na casa, uma dúvida ou feedback — diz-nos aqui. Vai direto para a equipa."}));
+    const tipos=[["arrived",{en:"I've arrived",pt:"Cheguei"}],["problem",{en:"Problem in the house",pt:"Problema na casa"}],["question",{en:"Question",pt:"Dúvida"}],["feedback",{en:"Feedback",pt:"Feedback"}]];
+    const eu=quemSou();let tipo="arrived",nota=0;
     const f=el("div");f.innerHTML=`
-      <label class="f">${LANG()==="pt"?"Nome":"Name"}</label><input id="ci-name">
-      <label class="f">${LANG()==="pt"?"Quarto / casa":"Room / house"}</label><input id="ci-room">
-      <div class="two"><div><label class="f">${LANG()==="pt"?"Chegada":"Arrival"}</label><input id="ci-date" type="date"></div>
-      <div><label class="f">${LANG()==="pt"?"Telefone":"Phone"}</label><input id="ci-phone"></div></div>
-      <label class="f">${LANG()==="pt"?"Contacto de emergência":"Emergency contact"}</label><input id="ci-emg">
-      <label class="f">${LANG()==="pt"?"Alergias / notas de saúde":"Allergies / health notes"}</label><textarea id="ci-notes" rows="2"></textarea>`;v.appendChild(f);
-    const btn=el("button","btn","✓ "+(LANG()==="pt"?"Confirmar chegada":"Confirm arrival"));
-    const done=el("div","done");const send=el("a","btn ghost","📨 "+(LANG()==="pt"?"Enviar à equipa":"Send to team"));send.style.display="none";
-    btn.onclick=()=>{done.classList.add("show");done.textContent=LANG()==="pt"?"✓ Guardado. Toca abaixo para avisar a equipa.":"✓ Saved. Tap below to notify the team.";
-      const body=encodeURIComponent(`Buinho check-in:\nName: ${val('ci-name')}\nRoom: ${val('ci-room')}\nArrival: ${val('ci-date')}\nPhone: ${val('ci-phone')}\nEmergency: ${val('ci-emg')}\nNotes: ${val('ci-notes')}`);
-      send.href=`mailto:info.alcobia@gmail.com?subject=${encodeURIComponent('AIR check-in — '+val('ci-name'))}&body=${body}`;send.style.display="inline-flex";};
-    v.appendChild(btn);v.appendChild(done);v.appendChild(send);return v;},
-  reserve(){const v=el("div");v.appendChild(head(secTitle("reserve"),{en:"Pick a machine and a slot. The team confirms.",pt:"Escolhe máquina e horário. A equipa confirma."}));
+      <label class="f">${pt?"Sobre o quê?":"What's it about?"}</label><div class="tp" id="eq-tipo"></div>
+      <div class="two"><div><label class="f">${pt?"Nome":"Name"}</label><input id="eq-nome" autocomplete="name"></div>
+      <div><label class="f">${pt?"Casa":"House"}</label><select id="eq-casa">${CASAS.map(c=>`<option>${esc(t(c))}</option>`).join("")}</select></div></div>
+      <div id="eq-nota-w" style="display:none"><label class="f">${pt?"Como correu a estadia? (1–5)":"How was your stay? (1–5)"}</label><div class="tp" id="eq-nota"></div></div>
+      <label class="f" id="eq-msg-l"></label><textarea id="eq-msg" rows="3"></textarea>
+      <input id="eq-hp" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">`;
+    v.appendChild(f);
+    const tp=f.querySelector("#eq-tipo"),msgL=f.querySelector("#eq-msg-l"),notaW=f.querySelector("#eq-nota-w");
+    const pinta=()=>{tp.querySelectorAll(".cat").forEach(b=>b.classList.toggle("on",b.dataset.t===tipo));
+      notaW.style.display=tipo==="feedback"?"block":"none";
+      msgL.textContent=tipo==="arrived"?(pt?"Alguma nota? (opcional)":"Anything to add? (optional)")
+        :tipo==="feedback"?(pt?"O que correu bem e o que podemos melhorar?":"What went well, and what could we improve?")
+        :(pt?"Conta-nos numa frase":"Tell us in a sentence");};
+    tipos.forEach(([k,l])=>{const b=el("span","cat",esc(t(l)));b.dataset.t=k;b.onclick=()=>{tipo=k;pinta();};tp.appendChild(b);});
+    const nt=f.querySelector("#eq-nota");[1,2,3,4,5].forEach(n=>{const b=el("span","cat",String(n));b.onclick=()=>{nota=n;nt.querySelectorAll(".cat").forEach(x=>x.classList.toggle("on",x===b));};nt.appendChild(b);});
+    f.querySelector("#eq-nome").value=eu.nome||"";if(eu.casa)f.querySelector("#eq-casa").value=eu.casa;pinta();
+    const btn=el("button","btn",(pt?"Enviar à equipa":"Send to the team")+" →");const done=el("div","done");
+    btn.onclick=()=>{const nome=val("eq-nome").trim(),casa=val("eq-casa"),msg=val("eq-msg").trim();
+      if(!nome){done.classList.add("show");done.textContent=pt?"Escreve o teu nome, por favor.":"Please add your name.";return;}
+      if(tipo!=="arrived"&&!msg&&!(tipo==="feedback"&&nota)){done.classList.add("show");done.textContent=pt?"Escreve uma frase, por favor.":"Please write a sentence.";return;}
+      guardarQuemSou(nome,casa);btn.disabled=true;
+      enviarEquipa({tipo,nome,casa,mensagem:msg,nota:tipo==="feedback"?nota:"",hp:val("eq-hp")},done,()=>{btn.disabled=false;f.querySelector("#eq-msg").value="";});};
+    v.appendChild(btn);v.appendChild(done);
+    v.appendChild(el("p","ag-stamp",esc(pt?"Urgência ou perigo? Usa o SOS (112).":"Emergency or danger? Use SOS (112).")));
+    return v;},
+  reserve(){const v=el("div");const pt=LANG()==="pt";v.appendChild(head(secTitle("reserve"),{en:"Pick a machine and a slot. The team confirms.",pt:"Escolhe máquina e horário. A equipa confirma."}));
     const opts=C.fablab.machines.filter(m=>m.book).map(m=>`<option value="${m.id}">${esc(t(m.name))}</option>`).join("");
-    const f=el("div");f.innerHTML=`<label class="f">${LANG()==="pt"?"Máquina":"Machine"}</label><select id="res-m">${opts}</select>
-      <label class="f">${LANG()==="pt"?"Nome":"Name"}</label><input id="res-name">
-      <div class="two"><div><label class="f">${LANG()==="pt"?"Dia":"Day"}</label><input id="res-date" type="date"></div>
-      <div><label class="f">${LANG()==="pt"?"Hora":"Time"}</label><input id="res-time" type="time"></div></div>
-      <label class="f">${LANG()==="pt"?"Notas (opcional)":"Notes (optional)"}</label><textarea id="res-notes" rows="2"></textarea>`;v.appendChild(f);
-    const btn=el("button","btn","📌 "+(LANG()==="pt"?"Pedir reserva":"Request booking"));const done=el("div","done");const send=el("a","btn ghost","📨 "+(LANG()==="pt"?"Enviar pedido":"Send request"));send.style.display="none";
-    btn.onclick=()=>{const mN=document.querySelector('#res-m option:checked').textContent;done.classList.add("show");done.textContent=LANG()==="pt"?"✓ Pedido pronto. Toca em enviar.":"✓ Request ready. Tap send.";
-      const body=encodeURIComponent(`Booking:\nMachine: ${mN}\nName: ${val('res-name')}\nDay: ${val('res-date')}\nTime: ${val('res-time')}\nNotes: ${val('res-notes')}`);
-      send.href=`mailto:info.alcobia@gmail.com?subject=${encodeURIComponent('FabLab booking — '+mN)}&body=${body}`;send.style.display="inline-flex";};
-    v.appendChild(btn);v.appendChild(done);v.appendChild(send);return v;}
+    const f=el("div");f.innerHTML=`<label class="f">${pt?"Máquina":"Machine"}</label><select id="res-m">${opts}</select>
+      <label class="f">${pt?"Nome":"Name"}</label><input id="res-name">
+      <div class="two"><div><label class="f">${pt?"Dia":"Day"}</label><input id="res-date" type="date"></div>
+      <div><label class="f">${pt?"Hora":"Time"}</label><input id="res-time" type="time"></div></div>
+      <label class="f">${pt?"Notas (opcional)":"Notes (optional)"}</label><textarea id="res-notes" rows="2"></textarea>`;v.appendChild(f);
+    f.querySelector("#res-name").value=quemSou().nome||"";
+    const btn=el("button","btn","📌 "+(pt?"Pedir reserva":"Request booking"));const done=el("div","done");
+    btn.onclick=()=>{const mN=document.querySelector('#res-m option:checked').textContent,nome=val("res-name").trim();
+      if(!nome||!val("res-date")){done.classList.add("show");done.textContent=pt?"Falta o nome ou o dia.":"Name and day, please.";return;}
+      guardarQuemSou(nome,quemSou().casa||"");btn.disabled=true;
+      enviarEquipa({tipo:"booking",nome,casa:quemSou().casa||"",mensagem:`${mN} · ${val("res-date")} ${val("res-time")}${val("res-notes")?" · "+val("res-notes"):""}`,nota:"",hp:""},done,()=>{btn.disabled=false;});};
+    v.appendChild(btn);v.appendChild(done);return v;}
 };
 
 /* ================= MAP ================= */
@@ -271,11 +289,35 @@ function locateMe(btn){
 
 function openMap(id){mapSel=id||null;mapFilter=null;go("map");}
 
+/* ================= botão Equipa → n8n → Telegram (Buinho Staff) + Sheet RESIDENCIES «PEDIDOS AIR» =================
+   Sem emails. Envia como text/plain (sem preflight CORS). Se o n8n não responder (fluxo ainda não importado/activo,
+   ou sem rede), abre o WhatsApp da equipa com a mensagem já escrita — nada se perde. */
+const EQUIPA_WEBHOOK="https://buinho.app.n8n.cloud/webhook/welcome-air";
+const EQUIPA_WHATSAPP="351939760933";   /* Produção / admin (residências) */
+const CASAS=[{en:"Casa São João",pt:"Casa São João"},{en:"Casa da Avó",pt:"Casa da Avó"},{en:"Casa Buinho",pt:"Casa Buinho"},
+  {en:"Casa da Padaria",pt:"Casa da Padaria"},{en:"Other / not staying",pt:"Outra / não estou alojado"}];
+const QUEM_KEY="buinho-quem-v1";
+function quemSou(){try{return JSON.parse(localStorage.getItem(QUEM_KEY)||"{}");}catch(e){return {};}}
+function guardarQuemSou(nome,casa){try{localStorage.setItem(QUEM_KEY,JSON.stringify({nome,casa}));}catch(e){}}
+const TIPO_TXT={arrived:"Cheguei",problem:"Problema na casa",question:"Dúvida",feedback:"Feedback",booking:"Reserva FabLab"};
+function enviarEquipa(d,done,fim){
+  const pt=LANG()==="pt";const corpo=Object.assign({},d,{lang:LANG(),enviado:new Date().toISOString()});
+  const ok=()=>{done.classList.add("show");done.textContent=pt?"✓ Enviado. A equipa já recebeu.":"✓ Sent. The team has it.";fim&&fim();};
+  const plano=()=>{const txt=`[Welcome Buinho] ${TIPO_TXT[d.tipo]||d.tipo} — ${d.nome} (${d.casa})${d.nota?" · nota "+d.nota+"/5":""}${d.mensagem?"\n"+d.mensagem:""}`;
+    done.classList.add("show");done.innerHTML=esc(pt?"Não consegui enviar daqui. Toca para mandar pelo WhatsApp:":"Couldn't send from here. Tap to send it on WhatsApp:")+
+      ` <a class="btn ghost" style="margin-top:8px" target="_blank" rel="noopener" href="https://wa.me/${EQUIPA_WHATSAPP}?text=${encodeURIComponent(txt)}">WhatsApp →</a>`;fim&&fim();};
+  fetch(EQUIPA_WEBHOOK,{method:"POST",headers:{"Content-Type":"text/plain;charset=UTF-8"},body:JSON.stringify(corpo)})
+    .then(r=>r.ok?ok():plano()).catch(plano);
+}
+
 /* ================= agenda (Google Sheet «AGENDA AIR — Welcome Buinho») =================
    A equipa escreve no Sheet (uma linha por actividade; mostrar = «não» esconde sem apagar).
    A app lê-o pelo endpoint gviz em JSON (datas como Date(...), sem depender do locale do Sheet).
    Requisito: o Sheet partilhado como «qualquer pessoa com o link pode ver».
    Offline: guarda a última cópia boa em localStorage; sem nenhuma, mostra o ritmo típico do content.js. */
+/* Fonte definitiva: aba AGENDA AIR do RESIDENCIES CONTROL MAP, publicada na web em CSV (só essa aba; o ficheiro fica privado).
+   Cola aqui o link «Publicar na Web → CSV». Enquanto estiver vazio, a app lê o Sheet provisório (gviz). */
+const AGENDA_CSV_URL="";
 const AGENDA_URL="https://docs.google.com/spreadsheets/d/1svol-yvGRVloQFeEGtUDbHupX_fan8OkiJh_AQAUKRc/gviz/tq?tqx=out:json&headers=1";
 const AGENDA_KEY="buinho-agenda-v1";
 let AGENDA=null;
@@ -305,11 +347,30 @@ function agendaProxima(){
   return AGENDA.rows.filter(a=>!/^(n[ãa]o|no|n)$/i.test(a.mostrar)&&a.data>=hoje)
     .sort((a,b)=>(a.data+a.ini).localeCompare(b.data+b.ini));
 }
+/* CSV simples com aspas (o formato do «Publicar na Web»). */
+function csvLinhas(txt){const out=[];let row=[],f="",q=false;
+  for(let i=0;i<txt.length;i++){const c=txt[i];
+    if(q){if(c==='"'){if(txt[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;}
+    else if(c==='"')q=true;else if(c===","){row.push(f);f="";}
+    else if(c==="\n"||c==="\r"){if(c==="\r"&&txt[i+1]==="\n")i++;row.push(f);out.push(row);row=[];f="";}
+    else f+=c;}
+  if(f!==""||row.length){row.push(f);out.push(row);}return out;}
+function agNormData(s){s=(s||"").trim();let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);if(m)return m[1]+"-"+p2(m[2])+"-"+p2(m[3]);
+  m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);if(m)return m[3]+"-"+p2(m[2])+"-"+p2(m[1]);return s;}   /* dd/mm/aaaa (locale PT) */
+const agNormHora=s=>{const m=(s||"").match(/(\d{1,2}):(\d{2})/);return m?p2(m[1])+":"+m[2]:(s||"").trim();};
+function agLerCSV(txt){const L=csvLinhas(txt).filter(r=>r.some(x=>x.trim()));if(!L.length)return [];
+  const cols=L[0].map(c=>c.trim().toLowerCase()),ix=k=>cols.indexOf(k);
+  return L.slice(1).map(r=>{const g=k=>ix(k)<0?"":(r[ix(k)]||"").trim();
+    return {data:agNormData(g("data")),ini:agNormHora(g("hora_inicio")),fim:agNormHora(g("hora_fim")),tpt:g("titulo_pt"),ten:g("titulo_en"),
+            local:g("local"),npt:g("notas_pt"),nen:g("notas_en"),mostrar:g("mostrar")};
+  }).filter(a=>/^\d{4}-\d{2}-\d{2}$/.test(a.data)&&(a.tpt||a.ten));}
 function actualizarAgenda(){
-  return fetch(AGENDA_URL,{cache:"no-store"}).then(r=>r.text()).then(txt=>{
-    const json=JSON.parse(txt.slice(txt.indexOf("(")+1,txt.lastIndexOf(")")));
-    if(json.status!=="ok")return;
-    AGENDA={rows:agLer(json),at:new Date().toISOString()};
+  const csv=!!AGENDA_CSV_URL;
+  return fetch(csv?AGENDA_CSV_URL:AGENDA_URL,{cache:"no-store"}).then(r=>r.text()).then(txt=>{
+    let rows;
+    if(csv){rows=agLerCSV(txt);}
+    else{const json=JSON.parse(txt.slice(txt.indexOf("(")+1,txt.lastIndexOf(")")));if(json.status!=="ok")return;rows=agLer(json);}
+    AGENDA={rows,at:new Date().toISOString()};
     try{localStorage.setItem(AGENDA_KEY,JSON.stringify(AGENDA));}catch(e){}
     if((location.hash||"").slice(1)==="schedule")route();
   }).catch(()=>{});
