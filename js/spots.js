@@ -28,7 +28,7 @@ const CATS = {
 /* EDITÁVEL: a equipa muda estes pontos. lat/lon = posição real no mapa.
    Coordenadas seed à volta de Messejana; afinar com as reais. */
 const SPOTS = [
-  {id:"hq", cat:"buinho", lat:37.8344682, lon:-8.2451180, name:{en:"Buinho HQ / FabLab (you are here)",pt:"Sede Buinho / FabLab (estás aqui)"}, hours:{en:"Your base",pt:"A tua base"}, note:{en:"Rua [•••], Messejana.",pt:"Rua [•••], Messejana."}},
+  {id:"hq", addr:"Praça 1º de Julho, 11", cat:"buinho", lat:37.8344682, lon:-8.2451180, name:{en:"Buinho HQ / FabLab (you are here)",pt:"Sede Buinho / FabLab (estás aqui)"}, hours:{en:"Your base",pt:"A tua base"}, note:{en:"Praça 1º de Julho, 11, Messejana.",pt:"Praça 1º de Julho, 11, Messejana."}},
   {id:"educativo", addr:"Rua da Bicada, 11", cat:"buinho", lat:37.8337425, lon:-8.2436441, name:{en:"Buinho Educativo",pt:"Buinho Educativo"}, hours:{en:"—",pt:"—"}, note:{en:"The education space.",pt:"O espaço educativo."}},
   {id:"casadavo", addr:"Praça 1º de Julho, 7", cat:"buinho", lat:37.8349167, lon:-8.2451759, name:{en:"Casa d'Avó (residency house)",pt:"Casa d'Avó (casa de residência)"}, hours:{en:"—",pt:"—"}, note:{en:"Buinho residency accommodation.",pt:"Alojamento de residência do Buinho."}},
   {id:"saojoao", addr:"Rua Nova de Palma, 33", cat:"buinho", lat:37.8326427, lon:-8.2431600, name:{en:"São João house (residency)",pt:"Casa de São João (residência)"}, hours:{en:"—",pt:"—"}, note:{en:"Buinho residency accommodation.",pt:"Alojamento de residência do Buinho."}},
