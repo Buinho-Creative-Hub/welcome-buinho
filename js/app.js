@@ -89,8 +89,27 @@ const DETAIL={
       const b=block(null,`<h3>${esc(t(m.name))}${tag}</h3><p>${esc(t(m.notes))}</p>`);
       if(m.book){const rb=el("button","btn ghost",(LANG()==="pt"?"Reservar":"Reserve")+" →");rb.onclick=()=>{go("reserve");setTimeout(()=>{const s=document.getElementById("res-m");if(s)s.value=m.id;},50);};b.appendChild(rb);}
       v.appendChild(b);});return v;},
-  schedule(){const d=C.schedule,v=el("div");v.appendChild(head(secTitle("schedule"),d.intro));
-    d.items.forEach(it=>v.appendChild(block(it.w,`<p>${esc(t(it.x))}</p>`)));return v;},
+  schedule(){const d=C.schedule,v=el("div");
+    const ag=agendaProxima();
+    if(ag.length){
+      v.appendChild(head(secTitle("schedule"),{en:"What's on at Buinho in the coming days.",pt:"O que há no Buinho nos próximos dias."}));
+      const loc=LANG()==="pt"?"pt-PT":"en-GB";
+      let dia=null,bl=null;
+      ag.forEach(a=>{
+        if(a.data!==dia){dia=a.data;
+          const nome=new Date(a.data+"T12:00:00").toLocaleDateString(loc,{weekday:"long",day:"numeric",month:"long"});
+          bl=block(nome.charAt(0).toUpperCase()+nome.slice(1),"");v.appendChild(bl);}
+        const hora=a.ini+(a.fim?"–"+a.fim:"");
+        const tit=LANG()==="pt"?(a.tpt||a.ten):(a.ten||a.tpt), nota=LANG()==="pt"?(a.npt||a.nen):(a.nen||a.npt);
+        bl.insertAdjacentHTML("beforeend",`<div class="ag"><div class="ag-h">${esc(hora)}</div><div><div class="ag-t">${esc(tit)}</div>${a.local?`<div class="ag-m">📍 ${esc(a.local)}</div>`:""}${nota?`<div class="ag-m">${esc(nota)}</div>`:""}</div></div>`);
+      });
+      if(AGENDA&&AGENDA.at){const quando=new Date(AGENDA.at).toLocaleString(loc,{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+        v.appendChild(el("p","ag-stamp",esc((LANG()==="pt"?"Actualizado a ":"Updated ")+quando)));}
+    } else {
+      v.appendChild(head(secTitle("schedule"),d.intro));
+      d.items.forEach(it=>v.appendChild(block(it.w,`<p>${esc(t(it.x))}</p>`)));
+    }
+    return v;},
   contacts(){const d=C.contacts,v=el("div");v.appendChild(head(secTitle("contacts")));
     const sos=el("div","sos");sos.innerHTML=`<div class="n">112</div><div><strong>${esc(t(d.emgLabel))}</strong></div>`;v.appendChild(sos);
     const call=el("a","btn red","📞 112");call.href="tel:112";v.appendChild(call);
@@ -252,6 +271,49 @@ function locateMe(btn){
 
 function openMap(id){mapSel=id||null;mapFilter=null;go("map");}
 
+/* ================= agenda (Google Sheet «AGENDA AIR — Welcome Buinho») =================
+   A equipa escreve no Sheet (uma linha por actividade; mostrar = «não» esconde sem apagar).
+   A app lê-o pelo endpoint gviz em JSON (datas como Date(...), sem depender do locale do Sheet).
+   Requisito: o Sheet partilhado como «qualquer pessoa com o link pode ver».
+   Offline: guarda a última cópia boa em localStorage; sem nenhuma, mostra o ritmo típico do content.js. */
+const AGENDA_URL="https://docs.google.com/spreadsheets/d/1svol-yvGRVloQFeEGtUDbHupX_fan8OkiJh_AQAUKRc/gviz/tq?tqx=out:json&headers=1";
+const AGENDA_KEY="buinho-agenda-v1";
+let AGENDA=null;
+try{AGENDA=JSON.parse(localStorage.getItem(AGENDA_KEY)||"null");}catch(e){AGENDA=null;}
+const p2=n=>String(n).padStart(2,"0");
+function agCel(c){
+  if(!c||c.v==null)return "";
+  const v=c.v;
+  if(Array.isArray(v))return p2(v[0])+":"+p2(v[1]);                       /* hora (timeofday) */
+  if(typeof v==="string"){const m=v.match(/^Date\((\d+),(\d+),(\d+)/);   /* data: mês 0-based */
+    if(m)return m[1]+"-"+p2(+m[2]+1)+"-"+p2(m[3]);
+    return v.trim();}
+  return c.f!=null?String(c.f):String(v);
+}
+function agLer(json){
+  const tb=json.table, cols=tb.cols.map(c=>(c.label||"").trim().toLowerCase());
+  const ix=k=>cols.indexOf(k);
+  return tb.rows.map(r=>{const g=k=>ix(k)<0?"":agCel(r.c[ix(k)]);
+    return {data:g("data"),ini:g("hora_inicio"),fim:g("hora_fim"),tpt:g("titulo_pt"),ten:g("titulo_en"),
+            local:g("local"),npt:g("notas_pt"),nen:g("notas_en"),mostrar:g("mostrar")};
+  }).filter(a=>/^\d{4}-\d{2}-\d{2}$/.test(a.data)&&(a.tpt||a.ten));
+}
+function agendaProxima(){
+  if(!AGENDA||!AGENDA.rows)return [];
+  const h=new Date(),hoje=h.getFullYear()+"-"+p2(h.getMonth()+1)+"-"+p2(h.getDate());
+  return AGENDA.rows.filter(a=>!/^(n[ãa]o|no|n)$/i.test(a.mostrar)&&a.data>=hoje)
+    .sort((a,b)=>(a.data+a.ini).localeCompare(b.data+b.ini));
+}
+function actualizarAgenda(){
+  return fetch(AGENDA_URL,{cache:"no-store"}).then(r=>r.text()).then(txt=>{
+    const json=JSON.parse(txt.slice(txt.indexOf("(")+1,txt.lastIndexOf(")")));
+    if(json.status!=="ok")return;
+    AGENDA={rows:agLer(json),at:new Date().toISOString()};
+    try{localStorage.setItem(AGENDA_KEY,JSON.stringify(AGENDA));}catch(e){}
+    if((location.hash||"").slice(1)==="schedule")route();
+  }).catch(()=>{});
+}
+
 /* ================= router ================= */
 function go(id){location.hash=id?("#"+id):"#home";}
 function route(){
@@ -276,6 +338,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   document.getElementById("backbtn").onclick=()=>go("home");
   document.querySelectorAll(".bottombar button").forEach(b=>b.onclick=()=>go(b.dataset.go));
   renderHome();route();window.addEventListener("hashchange",route);
+  actualizarAgenda();
 });
 
 /* ================= PWA: registar o service worker (offline + instalável) ================= */
