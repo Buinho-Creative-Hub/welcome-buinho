@@ -420,8 +420,13 @@ function agendaProxima(){
   if(!AGENDA||!AGENDA.rows)return [];
   const h=new Date(),hoje=h.getFullYear()+"-"+p2(h.getMonth()+1)+"-"+p2(h.getDate());
   return AGENDA.rows.filter(a=>!/^(n[ãa]o|no|n)$/i.test(a.mostrar)&&a.data>=hoje)
-    .sort((a,b)=>(a.data+a.ini).localeCompare(b.data+b.ini));
+    .sort((a,b)=>(a.data+horaOrd(a.ini)).localeCompare(b.data+horaOrd(b.ini)));
 }
+/* A equipa escreve as horas de várias formas («9am», «9.30 am», «2pm», «14:00», «14h»).
+   Para ordenar converte-se tudo para HH:MM (24h); o que se mostra continua a ser o que está no Sheet. */
+function horaOrd(s){s=(s||"").toLowerCase().replace(/\s+/g,"");
+  const m=s.match(/^(\d{1,2})(?:[:.h](\d{2}))?h?(am|pm)?$/);if(!m)return "99:99";
+  let h=+m[1];const mi=m[2]||"00";if(m[3]==="pm"&&h<12)h+=12;if(m[3]==="am"&&h===12)h=0;return p2(h)+":"+mi;}
 /* CSV simples com aspas (o formato do «Publicar na Web»). */
 function csvLinhas(txt){const out=[];let row=[],f="",q=false;
   for(let i=0;i<txt.length;i++){const c=txt[i];
@@ -552,9 +557,35 @@ document.addEventListener("DOMContentLoaded",()=>{
   actualizarMapa();
 });
 
+/* ================= Refresh automático (Carlos, 19 Out) =================
+   Quem deixa a app aberta deve ver as mudanças da agenda, do guia e do mapa sem ter de a fechar:
+   - ao voltar à app (sai do bolso, muda de separador) → vai buscar tudo de novo (no máximo 1×/min);
+   - com a app à frente → de 5 em 5 minutos;
+   - e pergunta se há versão nova da app; se houver, recarrega quando a pessoa não está a escrever. */
+let ULTIMO_REFRESH=Date.now();
+function refrescar(forcar){
+  if(!navigator.onLine)return;
+  if(!forcar&&Date.now()-ULTIMO_REFRESH<60000)return;
+  ULTIMO_REFRESH=Date.now();
+  actualizarAgenda();actualizarGuia();actualizarMapa();
+  if(navigator.serviceWorker&&navigator.serviceWorker.getRegistration)
+    navigator.serviceWorker.getRegistration().then(r=>r&&r.update()).catch(()=>{});
+}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")refrescar(false);});
+window.addEventListener("online",()=>refrescar(true));
+setInterval(()=>{if(document.visibilityState==="visible")refrescar(true);},5*60*1000);
+function aEscrever(){const a=document.activeElement;return !!a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName);}
+
 /* ================= PWA: registar o service worker (offline + instalável) ================= */
 if("serviceWorker" in navigator){
   window.addEventListener("load",()=>{
     navigator.serviceWorker.register("./service-worker.js").catch(()=>{});
+    /* versão nova activada → recarregar, mas nunca a meio de um formulário */
+    let recarregou=false;const tinhaSW=!!navigator.serviceWorker.controller;  /* na 1.ª visita não recarrega */
+    navigator.serviceWorker.addEventListener("controllerchange",()=>{
+      if(recarregou||!tinhaSW)return;
+      const tentar=()=>{if(aEscrever()){setTimeout(tentar,30000);return;}recarregou=true;location.reload();};
+      tentar();
+    });
   });
 }
