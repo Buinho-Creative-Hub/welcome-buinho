@@ -68,6 +68,10 @@ function renderHome(){
       ${s.todo?`<span class="todo">${esc(t(s.todo))}</span>`:""}<span class="arr">›</span>`;
     li.onclick=()=>go(s.id); ul.appendChild(li);
   });
+  /* Mapa e Assistente também no índice (feedback Mónica, 19 Out): em alguns telemóveis a barra de baixo não se vê. */
+  [{id:"map",n:"07",title:{en:"Map of Messejana",pt:"Mapa de Messejana"}},{id:"ask",n:"08",title:{en:"Assistant",pt:"Assistente"}}].forEach(s=>{
+    const li=el("li");li.innerHTML=`<span class="n">${s.n}</span><span class="ti">${esc(t(s.title))}</span><span class="arr">›</span>`;
+    li.onclick=()=>go(s.id);ul.appendChild(li);});
   v.appendChild(ul);
   v.appendChild(el("div","foot","Buinho FabLab · Messejana, Alentejo · CC-BY-SA 4.0"));
 }
@@ -233,9 +237,10 @@ function formReserva(){const pt=LANG()==="pt",v=el("div","block");v.id="reservar
 /* ================= MAP ================= */
 let mapFilter=null, mapSel=null;
 /* «Ir»: abre o Google Maps no sítio certo — morada se houver, senão as coordenadas do pin. */
+/* Feedback Mónica (19 Out): com a morada, o Google não encontrava «Praça 1º de Julho, 7» nem a Junta.
+   Agora vai sempre às coordenadas do pin, em modo direcções. */
 function goUrl(s){
-  const q = s.addr ? s.addr + ', 7600 Messejana, Portugal' : s.lat + ',' + s.lon;
-  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+  return 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(s.lat + ',' + s.lon);
 }
 function spotRow(s){
   const c=CATS[s.cat];
