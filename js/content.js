@@ -16,7 +16,7 @@ const C = {
   sections:[
     {id:"arrival",n:"01",title:{en:"Start here",pt:"Começa aqui"}},
     {id:"house",n:"02",title:{en:"Guide: house, Buinho & surroundings",pt:"Guia: casa, Buinho e arredores"}},
-    {id:"fablab",n:"03",title:{en:"FabLab: info & bookings",pt:"FabLab: informação e reservas"}},
+    {id:"fablab",n:"03",title:{en:"FabLab: info & machines",pt:"FabLab: informação e máquinas"}},
     {id:"schedule",n:"04",title:{en:"Your week",pt:"A tua semana"}},
     {id:"contacts",n:"05",title:{en:"Contacts & safety",pt:"Contactos e segurança"}},
     {id:"checkin",n:"06",title:{en:"Talk to the team",pt:"Falar com a equipa"}}
@@ -32,7 +32,7 @@ const C = {
     wifi:{net:"Buinho (Starlink)",pass:"buinho15",note:{en:"Several Starlink networks across the village — same password everywhere.",pt:"Várias redes Starlink pela aldeia — a mesma password em todas."}},
     rules:{en:["Quiet hours after 23:00 — neighbours are close.","Clean the kitchen after use; your fridge shelf is labelled.","Separate waste: yellow (plastic/metal), blue (paper), green (glass), brown (organic).","Last one out switches off lights, heating/AC and locks up.","No smoking indoors — outside, away from the FabLab.","Overnight guests? Let your host know first."],
         pt:["Silêncio depois das 23:00 — os vizinhos estão perto.","Limpa a cozinha depois de usar; a tua prateleira do frigorífico está identificada.","Separa o lixo: amarelo (plástico/metal), azul (papel), verde (vidro), castanho (orgânico).","O último a sair apaga luzes, aquecimento/AC e tranca.","Não se fuma dentro — lá fora, longe do FabLab.","Hóspedes a dormir? Avisa o anfitrião primeiro."]}},
-  fablab:{intro:{en:"The FabLab is open to residents on weekdays, 9am–5pm, following the team's hours. Machines are used with the team's supervision — book a slot below and do the induction before first use.",pt:"O FabLab está aberto aos residentes nos dias úteis, das 9h às 17h, no horário da equipa. As máquinas usam-se com supervisão da equipa — reserva em baixo e faz a indução antes do primeiro uso."},
+  fablab:{intro:{en:"The FabLab is open to residents on weekdays, 9am–5pm, following the team's hours. Machines are used with the team's supervision — talk to the team to arrange it, and do the induction before first use.",pt:"O FabLab está aberto aos residentes nos dias úteis, das 9h às 17h, no horário da equipa. As máquinas usam-se com supervisão da equipa — combina com a equipa e faz a indução antes do primeiro uso."},
     rules:{en:["Supervision by the team is required for every machine.","Induction before first use of each machine.","Small amounts of the materials we have are included; for bigger quantities or specific materials, talk to the team and we'll help you source them.","Leave tools and machines clean and back in place."],
       pt:["O uso de qualquer máquina tem supervisão da equipa.","Indução antes do primeiro uso de cada máquina.","Pequenas quantidades do material que temos estão incluídas; para quantidades maiores ou materiais específicos, fala com a equipa e ajudamos a encontrá-los.","Deixa ferramentas e máquinas limpas e no lugar."]},
     machines:[
@@ -48,7 +48,7 @@ const C = {
   schedule:{intro:{en:"A typical rhythm. Your host confirms your exact plan.",pt:"Um ritmo típico. O anfitrião confirma o teu plano."},
     items:[
       {w:{en:"Day 1 · Welcome",pt:"Dia 1 · Boas-vindas"},x:{en:"Check-in, house tour, FabLab induction, dinner together.",pt:"Check-in, visita à casa, indução no FabLab, jantar em conjunto."}},
-      {w:{en:"Open studio",pt:"Estúdio aberto"},x:{en:"FabLab open in work hours. Book machines as needed.",pt:"FabLab aberto em horário de trabalho. Reserva máquinas conforme precisares."}},
+      {w:{en:"Open studio",pt:"Estúdio aberto"},x:{en:"FabLab open in work hours. Arrange machine use with the team.",pt:"FabLab aberto em horário de trabalho. Combina com a equipa o uso das máquinas."}},
       {w:{en:"Community moment",pt:"Momento comunidade"},x:{en:"Share your work-in-progress with the team / village.",pt:"Partilha o teu trabalho-em-curso com a equipa / aldeia."}},
       {w:{en:"Final · Open day",pt:"Final · Dia aberto"},x:{en:"Show what you made. Pack-down and check-out.",pt:"Mostra o que fizeste. Arrumação e check-out."}}
     ]},

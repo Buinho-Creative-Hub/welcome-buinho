@@ -10,6 +10,7 @@
    ============================================================================ */
 /* ================= i18n / helpers ================= */
 const M={lang:"en"};
+const RESERVAS_ON=false; /* reserva de máquinas em stand-by — ver DETAIL.fablab */
 const LANG=()=>M.lang, t=o=>(o&&typeof o==="object"&&("en"in o))?(o[LANG()]??o.en):o;
 const el=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -112,12 +113,19 @@ const DETAIL={
   fablab(){const d=C.fablab,v=el("div"),pt=LANG()==="pt";v.appendChild(head(secTitle("fablab"),d.intro));
     if(d.rules){const r=el("div","block");r.appendChild(el("h3",null,pt?"Como funciona":"How it works"));
       const ul=el("ul","rules");t(d.rules).forEach(x=>ul.appendChild(el("li",null,esc(x))));r.appendChild(ul);v.appendChild(r);}
-    d.machines.forEach(m=>{const tag=m.book?`<span class="mtag">${pt?"reserva":"booking"}</span>`:"";
+    /* RESERVAS_ON=false: reserva de máquinas em stand-by (Carlos, 19 Out) até a equipa decidir como organiza o apoio.
+       Para voltar a ligar: true (e repor os textos em content.js / GUIA AIR). */
+    d.machines.forEach(m=>{const tag=(RESERVAS_ON&&m.book)?`<span class="mtag">${pt?"reserva":"booking"}</span>`:"";
       const b=block(null,`<h3>${esc(t(m.name))}${tag}</h3>${m.spec?`<p>${esc(t(m.spec))}</p>`:""}${m.notes?`<p class="note">${esc(t(m.notes))}</p>`:""}`);
-      if(m.book){const rb=el("button","btn ghost",(pt?"Reservar":"Book")+" ↓");rb.onclick=()=>{const s=document.getElementById("res-m");if(s)s.value=m.id;document.getElementById("reservar")?.scrollIntoView({behavior:"smooth"});};b.appendChild(rb);}
+      if(!RESERVAS_ON){}
+      else if(m.book){const rb=el("button","btn ghost",(pt?"Reservar":"Book")+" ↓");rb.onclick=()=>{const s=document.getElementById("res-m");if(s)s.value=m.id;document.getElementById("reservar")?.scrollIntoView({behavior:"smooth"});};b.appendChild(rb);}
       else b.insertAdjacentHTML("beforeend",`<p class="note">${pt?"Sem reserva — fala com a equipa no FabLab.":"No booking needed — ask the team at the FabLab."}</p>`);
       v.appendChild(b);});
-    v.appendChild(formReserva());return v;},
+    if(RESERVAS_ON)v.appendChild(formReserva());
+    else{const nb=el("div","block");nb.appendChild(el("h3",null,pt?"Usar uma máquina":"Using a machine"));
+      nb.insertAdjacentHTML("beforeend",`<p>${pt?"Fala com a equipa sobre o que queres fazer: combinamos contigo quando e com quem podes usar cada máquina.":"Tell the team what you'd like to make: we'll arrange with you when, and with whom, you can use each machine."}</p>`);
+      const tb=el("button","btn",(pt?"Falar com a equipa":"Talk to the team")+" →");tb.onclick=()=>go("checkin");nb.appendChild(tb);v.appendChild(nb);}
+    return v;},
   schedule(){const d=C.schedule,v=el("div");
     const ag=agendaProxima();
     if(ag.length){
@@ -456,7 +464,7 @@ const PERG_EN={"Que carrinhas passam na vila (pão, fruta, peixe)?":"Which vans 
   "Onde lavo e seco a roupa?":"Where can I do laundry?","Como funciona a água quente?":"How does the hot water work?",
   "Como funciona o aquecimento / ar condicionado?":"How do heating / air conditioning work?","As chaves e a fechadura têm alguma particularidade?":"Anything special about keys and locks?",
   "Lixo: onde está o contentor e quando passa o camião?":"Rubbish: where is the bin and when is collection?","O que faço se faltar a luz ou a água?":"What if the power or water goes off?",
-  "O que é o Buinho?":"What is Buinho?","Qual é o horário do FabLab?":"What are the FabLab hours?","Como reservo uma máquina?":"How do I book a machine?",
+  "O que é o Buinho?":"What is Buinho?","Qual é o horário do FabLab?":"What are the FabLab hours?","Como reservo uma máquina?":"How do I book a machine?","Como uso as máquinas do FabLab?":"How do I use the FabLab machines?",
   "Os materiais estão incluídos?":"Are materials included?","Há apresentação final / dia aberto?":"Is there a final presentation / open studio?",
   "Onde compro comida?":"Where can I buy food?","Onde posso comer fora?":"Where can I eat out?","Há multibanco? Aceitam cartão?":"Is there an ATM? Do places take cards?",
   "Como me desloco (autocarros, táxi)?":"How do I get around (buses, taxi)?","Onde é a piscina?":"Where is the swimming pool?",
