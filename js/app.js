@@ -261,7 +261,12 @@ function spotRow(s){
 }
 let LMAP=null, LMARKERS={};
 function renderMap(){
-  const v=document.getElementById("v-map");v.innerHTML="";LMAP=null;LMARKERS={};
+  /* v31 (19 Out): destruir o mapa anterior ANTES de criar outro. Sem isto cada
+     redesenho (filtro, dados novos do Sheet, refresh) deixava um Leaflet vivo em
+     memória, com camadas gráficas e ouvintes de eventos — com a app instalada e
+     o refresh automático da v30, acumulavam-se até o Pixel 9 do Carlos rebentar. */
+  if(LMAP){try{LMAP.remove();}catch(e){}}
+  const v=document.getElementById("v-map");v.innerHTML="";LMAP=null;LMARKERS={};USERMARK=null;USERRING=null;
   v.appendChild(head({en:"Messejana map",pt:"Mapa de Messejana"},{en:"The village, from your door. Tap a pin or a place.",pt:"A aldeia, a partir da tua porta. Toca num pino ou num sítio."}));
   const wrap=el("div","mapwrap");wrap.innerHTML='<div id="leaflet"></div>';v.appendChild(wrap);
   const locBtn=el("button","btn ghost","📍 "+(LANG()==="pt"?"Onde estou":"Where am I"));
@@ -325,12 +330,14 @@ const TileComFallback = L.TileLayer.extend({
 
 function initLeaflet(){
   if(!window.L){document.getElementById("leaflet").innerHTML='<div style="padding:20px;color:#5a5a5a;font-size:14px">Mapa indisponível.</div>';return;}
-  LMAP=L.map("leaflet",{zoomControl:true,attributionControl:false,scrollWheelZoom:false}).setView(MESSEJANA,16);
+  LMAP=L.map("leaflet",{zoomControl:true,attributionControl:false,scrollWheelZoom:false,
+    /* v31: sem animações de zoom/fade — menos trabalho para a placa gráfica e nada a meio quando o mapa é destruído */
+    zoomAnimation:false,fadeAnimation:false,markerZoomAnimation:false}).setView(MESSEJANA,16);
   new TileComFallback('', {maxZoom:19, minZoom:13}).addTo(LMAP);
   L.control.attribution({prefix:false}).addAttribution('© OpenStreetMap contributors').addTo(LMAP);
   drawMarkers();
   const pts=SPOTS.filter(s=>(!mapFilter||s.cat===mapFilter)&&(mapFilter||!s.far)).map(s=>[s.lat,s.lon]);
-  const ajusta=()=>{if(!LMAP)return;LMAP.invalidateSize();if(pts.length>1){try{LMAP.fitBounds(pts,{padding:[30,30],maxZoom:16});}catch(e){}}};
+  const ajusta=()=>{if(!LMAP)return;LMAP.invalidateSize();if(pts.length>1){try{LMAP.fitBounds(pts,{padding:[30,30],maxZoom:16,animate:false});}catch(e){}}};
   ajusta();setTimeout(ajusta,200);
 }
 let USERMARK=null, USERRING=null;
@@ -522,9 +529,15 @@ function mapaLerCSV(txt){const L=csvLinhas(txt).filter(r=>r.some(x=>x.trim()));i
 try{const c=JSON.parse(localStorage.getItem(MAPA_KEY)||"null");if(c&&c.rows)aplicarMapa(c.rows);}catch(e){}
 function actualizarMapa(){
   return fetch(MAPA_CSV_URL,{cache:"no-store"}).then(r=>r.ok?r.text():"").then(txt=>{
-    const rows=mapaLerCSV(txt);if(!aplicarMapa(rows))return;
+    const rows=mapaLerCSV(txt);if(!rows||rows.length<3)return;
+    /* v31: se nada mudou no Sheet, não se mexe em nada (antes redesenhava sempre). */
+    if(JSON.stringify(rows)===JSON.stringify(SPOTS))return;
+    if(!aplicarMapa(rows))return;
     try{localStorage.setItem(MAPA_KEY,JSON.stringify({rows,at:new Date().toISOString()}));}catch(e){}
-    const h=(location.hash||"").slice(1);if(h==="map"||h==="house")route();
+    const h=(location.hash||"").slice(1);
+    /* No mapa: só os pinos e a lista — o mapa em si fica o mesmo. */
+    if(h==="map"&&LMAP){drawMarkers();refreshList();}
+    else if(h==="house")route();
   }).catch(()=>{});
 }
 
@@ -563,15 +576,17 @@ document.addEventListener("DOMContentLoaded",()=>{
    - com a app à frente → de 5 em 5 minutos;
    - e pergunta se há versão nova da app; se houver, recarrega quando a pessoa não está a escrever. */
 let ULTIMO_REFRESH=Date.now();
-function refrescar(forcar){
+/* v31: o mapa (sítios) só se refresca ao voltar à app — não quando a rede volta
+   nem de 5 em 5 minutos; os sítios quase nunca mudam e era aí que se acumulava. */
+function refrescar(forcar,comMapa){
   if(!navigator.onLine)return;
   if(!forcar&&Date.now()-ULTIMO_REFRESH<60000)return;
   ULTIMO_REFRESH=Date.now();
-  actualizarAgenda();actualizarGuia();actualizarMapa();
+  actualizarAgenda();actualizarGuia();if(comMapa)actualizarMapa();
   if(navigator.serviceWorker&&navigator.serviceWorker.getRegistration)
     navigator.serviceWorker.getRegistration().then(r=>r&&r.update()).catch(()=>{});
 }
-document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")refrescar(false);});
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")refrescar(false,true);});
 window.addEventListener("online",()=>refrescar(true));
 setInterval(()=>{if(document.visibilityState==="visible")refrescar(true);},5*60*1000);
 function aEscrever(){const a=document.activeElement;return !!a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName);}
