@@ -34,7 +34,9 @@ const ICONS={
   tree:'<path d="M12 3 6.5 12h11L12 3Z"/><path d="M12 8.5 8 15h8l-4-6.5Z"/><path d="M12 15v5"/>',
   house:'<path d="M4 11 12 4l8 7"/><path d="M6 10v10h12V10"/><path d="M10 20v-5h4v5"/>',
   landmark:'<path d="M4 9 12 4l8 5"/><path d="M5 20h14"/><path d="M7 10v8M12 10v8M17 10v8"/>',
-  star:'<path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"/>'
+  star:'<path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"/>',
+  /* símbolo de reciclagem (três setas) — desenho Lucide «recycle», licença ISC */
+  recycle:'<path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5"/><path d="M11 19h8.203a1.83 1.83 0 0 0 1.556-.89 1.784 1.784 0 0 0 0-1.775l-1.226-2.12"/><path d="m14 16-3 3 3 3"/><path d="M8.293 13.596 7.196 9.5 3.1 10.598"/><path d="m9.344 5.811 1.093-1.892A1.83 1.83 0 0 1 11.985 3a1.784 1.784 0 0 1 1.546.888l3.943 6.843"/><path d="m13.378 9.633 4.096 1.098 1.097-4.096"/>'
 };
 function catGlyph(cat){
   const ic=CATS[cat].icon;
@@ -509,7 +511,7 @@ function perguntarGuia(q){const pt=LANG()==="pt";
 /* ================= MAPA: lido da aba MAPA AIR (Sheet das residências); spots.js é a reserva offline ================= */
 const MAPA_CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vTuIC8nLTMgraHygpgZV8oLuoYvKs6jV3BTbzNHqKBzrM1k0KBXl0AF8824DlfkGIMV1cRxDjuGCecX/pub?gid=1008745359&single=true&output=csv";
 const MAPA_KEY="buinho-mapa-v1";
-const CAT_PT={"buinho":"buinho","lojas":"shop","loja":"shop","comer e café":"food","comer":"food","café":"food","saúde":"health","saude":"health","serviços":"money","servicos":"money","património":"culture","patrimonio":"culture","cultura":"culture","ar livre":"nature","desporto":"nature"};
+const CAT_PT={"buinho":"buinho","lojas":"shop","loja":"shop","comer e café":"food","comer":"food","café":"food","saúde":"health","saude":"health","serviços":"money","servicos":"money","património":"culture","patrimonio":"culture","cultura":"culture","ar livre":"nature","desporto":"nature","reciclagem":"recycle","ecopontos":"recycle","ecoponto":"recycle"};
 const slug=x=>String(x).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 function aplicarMapa(rows){if(!rows||rows.length<3)return false;
   SPOTS.length=0;rows.forEach(r=>SPOTS.push(r));return true;}

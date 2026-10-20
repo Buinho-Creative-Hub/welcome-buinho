@@ -26,7 +26,8 @@ const CATS = {
   health: {label:{en:"Health & pharmacy",pt:"Saúde e farmácia"}, color:"#c0392b", icon:"cross"},
   money:  {label:{en:"ATM & services",pt:"Multibanco e serviços"}, color:"#2b3350", icon:"euro"},
   culture:{label:{en:"Heritage & culture",pt:"Património e cultura"}, color:"#7a4fb5", icon:"landmark"},
-  nature: {label:{en:"Outdoors & sport",pt:"Ar livre e desporto"}, color:"#159a6b", icon:"tree"}
+  nature: {label:{en:"Outdoors & sport",pt:"Ar livre e desporto"}, color:"#159a6b", icon:"tree"},
+  recycle:{label:{en:"Recycling points",pt:"Ecopontos (reciclagem)"}, color:"#3f8f2f", icon:"recycle"}
 };
 /* EDITÁVEL: a equipa muda estes pontos. lat/lon = posição real no mapa.
    Coordenadas seed à volta de Messejana; afinar com as reais. */
@@ -56,9 +57,9 @@ const SPOTS = [
   {id:"junta", addr:"Praça 1º de Julho", cat:"money", lat:37.834607, lon:-8.244781, name:{en:"Parish council (Junta de Freguesia)",pt:"Junta de Freguesia"}, hours:{en:"",pt:""}, note:{en:"Local administration.",pt:"Administração local."}},
   {id:"fuel", cat:"money", lat:37.830889, lon:-8.241535, name:{en:"Petrol station & garage",pt:"Bomba de gasolina e oficina"}, hours:{en:"",pt:""}, note:{en:"Auto Reboques Messejanense — fuel, repairs and towing.",pt:"Auto Reboques Messejanense — combustível, reparações e reboque."}},
   {id:"toilets", cat:"money", lat:37.833144, lon:-8.245399, name:{en:"Public toilets",pt:"Casas de banho públicas"}, hours:{en:"",pt:""}, note:{en:"Next to the bus stop.",pt:"Ao lado da paragem de autocarro."}},
-  {id:"ecoponto1", cat:"money", lat:37.832472, lon:-8.246556, name:{en:"Recycling point 1",pt:"Ecoponto 1 (reciclagem)"}, hours:{en:"",pt:""}, note:{en:"Recycling bins: yellow (plastic & metal), blue (paper), green (glass).",pt:"Contentores de reciclagem: amarelo (plástico e metal), azul (papel), verde (vidro)."}},
-  {id:"ecoponto2", cat:"money", lat:37.831198, lon:-8.242817, name:{en:"Recycling point 2",pt:"Ecoponto 2 (reciclagem)"}, hours:{en:"",pt:""}, note:{en:"Recycling bins: yellow (plastic & metal), blue (paper), green (glass).",pt:"Contentores de reciclagem: amarelo (plástico e metal), azul (papel), verde (vidro)."}},
-  {id:"ecoponto3", cat:"money", lat:37.832128, lon:-8.237381, name:{en:"Recycling point 3",pt:"Ecoponto 3 (reciclagem)"}, hours:{en:"",pt:""}, note:{en:"Recycling bins: yellow (plastic & metal), blue (paper), green (glass).",pt:"Contentores de reciclagem: amarelo (plástico e metal), azul (papel), verde (vidro)."}},
+  {id:"ecoponto1", cat:"recycle", lat:37.832472, lon:-8.246556, name:{en:"Recycling point 1",pt:"Ecoponto 1 (reciclagem)"}, hours:{en:"",pt:""}, note:{en:"Recycling bins: yellow (plastic & metal), blue (paper), green (glass).",pt:"Contentores de reciclagem: amarelo (plástico e metal), azul (papel), verde (vidro)."}},
+  {id:"ecoponto2", cat:"recycle", lat:37.831198, lon:-8.242817, name:{en:"Recycling point 2",pt:"Ecoponto 2 (reciclagem)"}, hours:{en:"",pt:""}, note:{en:"Recycling bins: yellow (plastic & metal), blue (paper), green (glass).",pt:"Contentores de reciclagem: amarelo (plástico e metal), azul (papel), verde (vidro)."}},
+  {id:"ecoponto3", cat:"recycle", lat:37.832128, lon:-8.237381, name:{en:"Recycling point 3",pt:"Ecoponto 3 (reciclagem)"}, hours:{en:"",pt:""}, note:{en:"Recycling bins: yellow (plastic & metal), blue (paper), green (glass).",pt:"Contentores de reciclagem: amarelo (plástico e metal), azul (papel), verde (vidro)."}},
   /* --- Património e cultura --- */
   {id:"museu", addr:"Rua do Espírito Santo", cat:"culture", lat:37.834175, lon:-8.244773, name:{en:"Ethnographic Museum",pt:"Museu Etnográfico de Messejana"}, hours:{en:"",pt:""}, note:{en:"Rural life in Messejana. Tel. +351 284 655 177.",pt:"A vida rural em Messejana. Tel. 284 655 177."}},
   {id:"pelourinho", cat:"culture", lat:37.834535, lon:-8.244953, name:{en:"Pillory (Pelourinho)",pt:"Pelourinho"}, hours:{en:"",pt:""}, note:{en:"Old symbol of the town's charter, on the main square.",pt:"Antigo símbolo do foral, na praça."}},
